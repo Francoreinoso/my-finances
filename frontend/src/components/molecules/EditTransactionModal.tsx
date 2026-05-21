@@ -1,5 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useId, useState, type FormEvent } from 'react';
 import { Button } from '@/components/atoms/Button';
+import { Modal } from '@/components/molecules/Modal';
+import { FIELD_CLASS } from '@/lib/formClasses';
 import type { Category } from '@/types/category';
 import type { Transaction, TransactionChanges } from '@/types/transaction';
 
@@ -9,9 +11,6 @@ interface EditTransactionModalProps {
   onClose: () => void;
   onSubmit: (changes: TransactionChanges) => Promise<void>;
 }
-
-const FIELD_CLASS =
-  'rounded-md border border-border-default bg-bg-surface/60 px-3 py-2 text-text-primary placeholder:text-text-subtle focus:border-accent focus:outline-none';
 
 export function EditTransactionModal({
   transaction,
@@ -25,22 +24,16 @@ export function EditTransactionModal({
   const [description, setDescription] = useState(transaction.description);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handler);
-    return () => {
-      window.removeEventListener('keydown', handler);
-    };
-  }, [onClose]);
+  const [amountTouched, setAmountTouched] = useState(false);
+  const amountErrorId = useId();
 
   // El tipo y las cuentas no se editan; solo monto, fecha, categoría y descripción.
   const isTransfer = transaction.type === 'transfer';
   const visibleCategories = categories.filter((c) => c.type === transaction.type);
   const amountNumber = Number(amount);
-  const canSubmit = Number.isFinite(amountNumber) && amountNumber > 0 && !submitting;
+  const amountOk = Number.isFinite(amountNumber) && amountNumber > 0;
+  const showAmountError = amountTouched && !amountOk;
+  const canSubmit = amountOk && !submitting;
 
   const submit = async () => {
     if (!canSubmit) return;
@@ -71,21 +64,8 @@ export function EditTransactionModal({
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Editar transacción"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-bg-primary/70 px-4 py-8 backdrop-blur-sm"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-border-default bg-bg-surface p-6 shadow-2xl"
-      >
-        <h3 className="font-mono text-xl text-text-primary">Editar transacción</h3>
-
+    <Modal title="Editar transacción" onClose={onClose}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1 text-sm text-text-muted">
           Monto
           <input
@@ -95,10 +75,18 @@ export function EditTransactionModal({
             step="any"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
+            onBlur={() => setAmountTouched(true)}
+            aria-invalid={showAmountError}
+            aria-describedby={showAmountError ? amountErrorId : undefined}
             autoFocus
             className={FIELD_CLASS}
           />
         </label>
+        {showAmountError && (
+          <p id={amountErrorId} className="text-xs text-danger">
+            Ingresá un monto mayor a 0.
+          </p>
+        )}
 
         {!isTransfer && (
           <label className="flex flex-col gap-1 text-sm text-text-muted">
@@ -157,6 +145,6 @@ export function EditTransactionModal({
           </Button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }

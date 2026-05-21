@@ -1,5 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useId, useState, type FormEvent } from 'react';
 import { Button } from '@/components/atoms/Button';
+import { Modal } from '@/components/molecules/Modal';
+import { FIELD_CLASS } from '@/lib/formClasses';
 import type { Account } from '@/types/account';
 import type { Bucket, CreateBucketInput } from '@/types/bucket';
 
@@ -11,9 +13,6 @@ interface BucketFormModalProps {
   onSubmit: (data: CreateBucketInput) => Promise<void>;
 }
 
-const FIELD_CLASS =
-  'rounded-md border border-border-default bg-bg-surface/60 px-3 py-2 text-text-primary placeholder:text-text-subtle focus:border-accent focus:outline-none';
-
 export function BucketFormModal({ bucket, accounts, onClose, onSubmit }: BucketFormModalProps) {
   const [name, setName] = useState(bucket?.name ?? '');
   const [targetAmount, setTargetAmount] = useState(
@@ -23,22 +22,16 @@ export function BucketFormModal({ bucket, accounts, onClose, onSubmit }: BucketF
   const [accountId, setAccountId] = useState(bucket?.accountId ?? accounts[0]?.id ?? '');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nameTouched, setNameTouched] = useState(false);
+  const nameErrorId = useId();
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handler);
-    return () => {
-      window.removeEventListener('keydown', handler);
-    };
-  }, [onClose]);
-
+  const nameOk = name.trim() !== '';
+  const showNameError = nameTouched && !nameOk;
   const trimmedAmount = targetAmount.trim();
   const amountNumber = trimmedAmount === '' ? null : Number(trimmedAmount);
   const amountValid =
     amountNumber === null || (Number.isFinite(amountNumber) && amountNumber > 0);
-  const canSubmit = name.trim() !== '' && amountValid && !submitting;
+  const canSubmit = nameOk && amountValid && !submitting;
 
   const submit = async () => {
     if (!canSubmit) return;
@@ -65,35 +58,28 @@ export function BucketFormModal({ bucket, accounts, onClose, onSubmit }: BucketF
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={bucket ? 'Editar bucket' : 'Nuevo bucket'}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-bg-primary/70 px-4 py-8 backdrop-blur-sm"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-border-default bg-bg-surface p-6 shadow-2xl"
-      >
-        <h3 className="font-mono text-xl text-text-primary">
-          {bucket ? 'Editar bucket' : 'Nuevo bucket'}
-        </h3>
-
+    <Modal title={bucket ? 'Editar bucket' : 'Nuevo bucket'} onClose={onClose}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1 text-sm text-text-muted">
           Nombre
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onBlur={() => setNameTouched(true)}
+            aria-invalid={showNameError}
+            aria-describedby={showNameError ? nameErrorId : undefined}
             placeholder="Ej: Viaje"
             maxLength={80}
             autoFocus
             className={FIELD_CLASS}
           />
         </label>
+        {showNameError && (
+          <p id={nameErrorId} className="text-xs text-danger">
+            El nombre no puede estar vacío.
+          </p>
+        )}
 
         <label className="flex flex-col gap-1 text-sm text-text-muted">
           Monto objetivo <span className="text-text-subtle">(opcional)</span>
@@ -153,6 +139,6 @@ export function BucketFormModal({ bucket, accounts, onClose, onSubmit }: BucketF
           </Button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }

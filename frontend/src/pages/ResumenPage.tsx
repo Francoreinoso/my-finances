@@ -13,7 +13,7 @@ export function ResumenPage() {
     <section className="mx-auto max-w-3xl">
       <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="font-mono text-3xl tracking-tight text-text-primary">Resumen</h2>
+          <h1 className="font-mono text-3xl tracking-tight text-text-primary">Resumen</h1>
           <p className="text-sm text-text-muted">
             Tus ingresos, gastos y tasa de ahorro del mes.
           </p>
@@ -78,9 +78,9 @@ export function ResumenPage() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-medium uppercase tracking-wider text-text-subtle">
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-text-subtle">
               Gasto por categoría
-            </h3>
+            </h2>
             <CategoryDonut byCategory={summary.byCategory} />
           </div>
         </div>

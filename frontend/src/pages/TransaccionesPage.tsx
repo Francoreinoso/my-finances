@@ -1,9 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFinances } from '@/hooks/useFinances';
 import { Button } from '@/components/atoms/Button';
 import { AccountsBar } from '@/components/organisms/AccountsBar';
 import { TransactionTable } from '@/components/organisms/TransactionTable';
+import { TransactionFilters } from '@/components/molecules/TransactionFilters';
 import { NewTransactionModal } from '@/components/molecules/NewTransactionModal';
+import { EmptyState } from '@/components/molecules/EmptyState';
+import {
+  EMPTY_FILTER,
+  filterTransactions,
+  transactionMonths,
+  type TransactionFilter,
+} from '@/lib/filterTransactions';
 
 export function TransaccionesPage() {
   const {
@@ -17,6 +25,7 @@ export function TransaccionesPage() {
     deleteTransaction,
   } = useFinances();
   const [modalOpen, setModalOpen] = useState(false);
+  const [filter, setFilter] = useState<TransactionFilter>(EMPTY_FILTER);
 
   // Hotkey "N" para abrir el modal, salvo que se esté escribiendo en un campo.
   useEffect(() => {
@@ -34,11 +43,17 @@ export function TransaccionesPage() {
     };
   }, [modalOpen, status]);
 
+  const months = useMemo(() => transactionMonths(transactions), [transactions]);
+  const filtered = useMemo(
+    () => filterTransactions(transactions, filter),
+    [transactions, filter],
+  );
+
   return (
     <section className="mx-auto max-w-4xl">
       <header className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 className="font-mono text-3xl tracking-tight text-text-primary">Transacciones</h2>
+          <h1 className="font-mono text-3xl tracking-tight text-text-primary">Transacciones</h1>
           <p className="text-sm text-text-muted">Tus ingresos y gastos, cuenta por cuenta.</p>
         </div>
         <Button onClick={() => setModalOpen(true)} disabled={status !== 'ready'}>
@@ -60,13 +75,35 @@ export function TransaccionesPage() {
       {status === 'ready' && (
         <div className="flex flex-col gap-6">
           <AccountsBar accounts={accounts} />
-          <TransactionTable
-            transactions={transactions}
-            accounts={accounts}
-            categories={categories}
-            onUpdate={updateTransaction}
-            onDelete={deleteTransaction}
-          />
+          {transactions.length === 0 ? (
+            <EmptyState
+              title="Sin transacciones todavía"
+              hint="Agregá la primera con el botón de arriba (o la tecla N)."
+            />
+          ) : (
+            <div className="flex flex-col gap-3">
+              <TransactionFilters
+                months={months}
+                categories={categories}
+                filter={filter}
+                onChange={setFilter}
+              />
+              {filtered.length === 0 ? (
+                <EmptyState
+                  title="Sin resultados"
+                  hint="Ninguna transacción coincide con los filtros elegidos."
+                />
+              ) : (
+                <TransactionTable
+                  transactions={filtered}
+                  accounts={accounts}
+                  categories={categories}
+                  onUpdate={updateTransaction}
+                  onDelete={deleteTransaction}
+                />
+              )}
+            </div>
+          )}
         </div>
       )}
 

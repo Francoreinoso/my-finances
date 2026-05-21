@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCategories } from '@/hooks/useCategories';
 import { Button } from '@/components/atoms/Button';
 import { CategoryRow } from '@/components/molecules/CategoryRow';
+import { EmptyState } from '@/components/molecules/EmptyState';
 import { CategoryFormModal } from '@/components/molecules/CategoryFormModal';
 import type { Category } from '@/types/category';
 
@@ -19,7 +20,7 @@ export function CategoriasPage() {
     <section className="mx-auto max-w-2xl">
       <header className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 className="font-mono text-3xl tracking-tight text-text-primary">Categorías</h2>
+          <h1 className="font-mono text-3xl tracking-tight text-text-primary">Categorías</h1>
           <p className="text-sm text-text-muted">Las etiquetas de tus ingresos y gastos.</p>
         </div>
         <Button onClick={() => setFormTarget('new')} disabled={status !== 'ready'}>
@@ -38,17 +39,23 @@ export function CategoriasPage() {
         </div>
       )}
 
-      {status === 'ready' && (
-        <div className="flex flex-col gap-2">
-          {sorted.map((category) => (
-            <CategoryRow
-              key={category.id}
-              category={category}
-              onEdit={() => setFormTarget(category)}
-            />
-          ))}
-        </div>
-      )}
+      {status === 'ready' &&
+        (sorted.length === 0 ? (
+          <EmptyState
+            title="Todavía no tenés categorías"
+            hint="Creá la primera con el botón de arriba."
+          />
+        ) : (
+          <div className="flex flex-col gap-2">
+            {sorted.map((category) => (
+              <CategoryRow
+                key={category.id}
+                category={category}
+                onEdit={() => setFormTarget(category)}
+              />
+            ))}
+          </div>
+        ))}
 
       {formTarget !== null && (
         <CategoryFormModal

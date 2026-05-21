@@ -1,5 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useId, useState, type FormEvent } from 'react';
 import { Button } from '@/components/atoms/Button';
+import { Modal } from '@/components/molecules/Modal';
+import { FIELD_CLASS } from '@/lib/formClasses';
 import type { Account } from '@/types/account';
 import type { Category } from '@/types/category';
 import type { CreateTransactionInput, TransactionType } from '@/types/transaction';
@@ -12,13 +14,16 @@ interface NewTransactionModalProps {
   onSubmit: (input: CreateTransactionInput) => Promise<void>;
 }
 
-const FIELD_CLASS =
-  'rounded-md border border-border-default bg-bg-surface/60 px-3 py-2 text-text-primary placeholder:text-text-subtle focus:border-accent focus:outline-none';
-
 const TYPE_STYLES: Record<TransactionType, string> = {
   expense: 'bg-danger/20 text-danger',
   income: 'bg-success/20 text-success',
   transfer: 'bg-accent/20 text-accent',
+};
+
+const TYPE_LABELS: Record<TransactionType, string> = {
+  expense: 'Gasto',
+  income: 'Ingreso',
+  transfer: 'Transferencia',
 };
 
 export function NewTransactionModal({
@@ -37,21 +42,14 @@ export function NewTransactionModal({
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handler);
-    return () => {
-      window.removeEventListener('keydown', handler);
-    };
-  }, [onClose]);
+  const [amountTouched, setAmountTouched] = useState(false);
+  const amountErrorId = useId();
 
   const isTransfer = type === 'transfer';
   const visibleCategories = categories.filter((c) => c.type === type);
   const amountNumber = Number(amount);
   const amountOk = Number.isFinite(amountNumber) && amountNumber > 0;
+  const showAmountError = amountTouched && !amountOk;
   const sameAccount = isTransfer && fromAccountId !== '' && fromAccountId === toAccountId;
   const accountsOk = isTransfer
     ? fromAccountId !== '' && toAccountId !== '' && !sameAccount
@@ -106,32 +104,20 @@ export function NewTransactionModal({
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Nueva transacción"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-bg-primary/70 px-4 py-8 backdrop-blur-sm"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-border-default bg-bg-surface p-6 shadow-2xl"
-      >
-        <h3 className="font-mono text-xl text-text-primary">Nueva transacción</h3>
-
-        <div className="grid grid-cols-3 gap-2">
+    <Modal title="Nueva transacción" onClose={onClose}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div role="group" aria-label="Tipo de transacción" className="grid grid-cols-3 gap-2">
           {(['expense', 'income', 'transfer'] as const).map((t) => (
             <button
               key={t}
               type="button"
+              aria-pressed={type === t}
               onClick={() => changeType(t)}
               className={`rounded-md px-2 py-2 text-sm font-medium transition-colors ${
                 type === t ? TYPE_STYLES[t] : 'bg-bg-elevated text-text-muted'
               }`}
             >
-              {t === 'expense' ? 'Gasto' : t === 'income' ? 'Ingreso' : 'Transferencia'}
+              {TYPE_LABELS[t]}
             </button>
           ))}
         </div>
@@ -145,11 +131,19 @@ export function NewTransactionModal({
             step="any"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
+            onBlur={() => setAmountTouched(true)}
+            aria-invalid={showAmountError}
+            aria-describedby={showAmountError ? amountErrorId : undefined}
             placeholder="0"
             autoFocus
             className={FIELD_CLASS}
           />
         </label>
+        {showAmountError && (
+          <p id={amountErrorId} className="text-xs text-danger">
+            Ingresá un monto mayor a 0.
+          </p>
+        )}
 
         {isTransfer ? (
           <>
@@ -259,6 +253,6 @@ export function NewTransactionModal({
           </Button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }

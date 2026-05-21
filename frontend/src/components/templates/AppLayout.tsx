@@ -10,6 +10,13 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="relative flex min-h-screen text-text-primary">
+      <a
+        href="#contenido-principal"
+        className="sr-only z-50 rounded-md bg-accent px-4 py-2 text-sm font-medium text-bg-primary focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
+      >
+        Saltar al contenido
+      </a>
+
       {/* Capa 1: imagen de fondo con blur sutil */}
       <div
         aria-hidden="true"
@@ -38,7 +45,13 @@ export function AppLayout({ children }: AppLayoutProps) {
 
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
 
-      <main className="flex-1 overflow-y-auto p-8">{children}</main>
+      <main
+        id="contenido-principal"
+        tabIndex={-1}
+        className="flex-1 overflow-y-auto p-8"
+      >
+        {children}
+      </main>
     </div>
   );
 }

@@ -28,7 +28,7 @@ export function DatosPage() {
   return (
     <section className="mx-auto max-w-2xl">
       <header className="mb-6">
-        <h2 className="font-mono text-3xl tracking-tight text-text-primary">Datos</h2>
+        <h1 className="font-mono text-3xl tracking-tight text-text-primary">Datos</h1>
         <p className="text-sm text-text-muted">
           Respaldá tu base de datos y exportá tus movimientos.
         </p>
@@ -36,7 +36,7 @@ export function DatosPage() {
 
       <div className="flex flex-col gap-4">
         <div className="rounded-lg border border-border-default bg-bg-surface/70 p-5 backdrop-blur-sm">
-          <h3 className="font-medium text-text-primary">Respaldo</h3>
+          <h2 className="font-medium text-text-primary">Respaldo</h2>
           <p className="mt-1 text-sm text-text-muted">
             Copia el archivo de base de datos a la carpeta{' '}
             <code className="rounded bg-bg-elevated px-1 font-mono text-xs">data/backups/</code>,
@@ -61,7 +61,7 @@ export function DatosPage() {
         </div>
 
         <div className="rounded-lg border border-border-default bg-bg-surface/70 p-5 backdrop-blur-sm">
-          <h3 className="font-medium text-text-primary">Exportar transacciones</h3>
+          <h2 className="font-medium text-text-primary">Exportar transacciones</h2>
           <p className="mt-1 text-sm text-text-muted">
             Descargá todos tus movimientos en CSV — para abrir en Excel o pasarle a un contador.
           </p>

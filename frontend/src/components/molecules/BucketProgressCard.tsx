@@ -42,8 +42,10 @@ export function BucketProgressCard({ bucket, onEdit }: BucketProgressCardProps) 
   return (
     <div className="rounded-lg border border-border-default bg-bg-surface/70 p-5 backdrop-blur-sm">
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="font-medium text-text-primary">{name}</h3>
-        <div className="flex items-center gap-3">
+        <h3 className="min-w-0 truncate font-medium text-text-primary" title={name}>
+          {name}
+        </h3>
+        <div className="flex shrink-0 items-center gap-3">
           {targetDate !== null && (
             <span className="font-mono text-xs text-text-subtle">meta: {targetDate}</span>
           )}

@@ -1,5 +1,6 @@
 import { useRecurring } from '@/hooks/useRecurring';
 import { RecurringTransferCard } from '@/components/molecules/RecurringTransferCard';
+import { EmptyState } from '@/components/molecules/EmptyState';
 
 export function RecurrentesPage() {
   const { recurring, status, error, confirm, update } = useRecurring();
@@ -11,7 +12,7 @@ export function RecurrentesPage() {
   return (
     <section className="mx-auto max-w-3xl">
       <header className="mb-6">
-        <h2 className="font-mono text-3xl tracking-tight text-text-primary">Recurrentes</h2>
+        <h1 className="font-mono text-3xl tracking-tight text-text-primary">Recurrentes</h1>
         <p className="text-sm text-text-muted">
           Tus aportes programados. Cuando uno vence, confirmá que ya lo transferiste.
         </p>
@@ -28,24 +29,30 @@ export function RecurrentesPage() {
         </div>
       )}
 
-      {status === 'ready' && (
-        <div className="flex flex-col gap-4">
-          {pendingCount > 0 && (
-            <p className="text-sm text-accent">
-              Tenés {pendingCount} aporte{pendingCount === 1 ? '' : 's'} pendiente
-              {pendingCount === 1 ? '' : 's'} de confirmar.
-            </p>
-          )}
-          {sorted.map((r) => (
-            <RecurringTransferCard
-              key={r.id}
-              recurring={r}
-              onConfirm={confirm}
-              onUpdate={update}
-            />
-          ))}
-        </div>
-      )}
+      {status === 'ready' &&
+        (sorted.length === 0 ? (
+          <EmptyState
+            title="Todavía no hay aportes recurrentes"
+            hint="Acá vas a ver tus aportes programados a cada bucket."
+          />
+        ) : (
+          <div className="flex flex-col gap-4">
+            {pendingCount > 0 && (
+              <p className="text-sm text-accent">
+                Tenés {pendingCount} aporte{pendingCount === 1 ? '' : 's'} pendiente
+                {pendingCount === 1 ? '' : 's'} de confirmar.
+              </p>
+            )}
+            {sorted.map((r) => (
+              <RecurringTransferCard
+                key={r.id}
+                recurring={r}
+                onConfirm={confirm}
+                onUpdate={update}
+              />
+            ))}
+          </div>
+        ))}
     </section>
   );
 }

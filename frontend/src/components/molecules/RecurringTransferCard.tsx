@@ -40,8 +40,13 @@ export function RecurringTransferCard({
       }`}
     >
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="font-medium text-text-primary">{recurring.name}</h3>
-        <span className="font-mono text-lg text-accent">
+        <h3
+          className="min-w-0 truncate font-medium text-text-primary"
+          title={recurring.name}
+        >
+          {recurring.name}
+        </h3>
+        <span className="shrink-0 font-mono text-lg text-accent">
           {formatMoney(recurring.amount, 'CLP')}
         </span>
       </div>

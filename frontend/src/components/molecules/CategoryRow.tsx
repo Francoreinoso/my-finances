@@ -13,7 +13,9 @@ export function CategoryRow({ category, onEdit }: CategoryRowProps) {
         className="h-4 w-4 shrink-0 rounded-full"
         style={{ backgroundColor: category.color }}
       />
-      <span className="flex-1 text-text-primary">{category.name}</span>
+      <span className="min-w-0 flex-1 truncate text-text-primary" title={category.name}>
+        {category.name}
+      </span>
       <span className="text-xs uppercase tracking-wider text-text-subtle">
         {category.type === 'income' ? 'ingreso' : 'gasto'}
       </span>
