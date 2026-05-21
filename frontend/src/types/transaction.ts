@@ -15,15 +15,25 @@ export interface Transaction {
   createdAt: string;
 }
 
-/**
- * Body de POST /api/transactions. Fase 1: solo ingreso o gasto, con UNA
- * cuenta — el backend la mapea a origen o destino según el tipo.
- */
-export interface CreateTransactionInput {
+/** Body de POST /api/transactions para un ingreso o gasto: una sola cuenta. */
+export interface CashflowInput {
+  type: 'income' | 'expense';
   date: string;
   amount: number;
-  type: 'income' | 'expense';
   accountId: string;
   categoryId?: string | null;
   description?: string | null;
 }
+
+/** Body de POST /api/transactions para una transferencia: dos cuentas. */
+export interface TransferInput {
+  type: 'transfer';
+  date: string;
+  amount: number;
+  fromAccountId: string;
+  toAccountId: string;
+  description?: string | null;
+}
+
+/** Unión discriminada por `type` — refleja el schema del backend. */
+export type CreateTransactionInput = CashflowInput | TransferInput;

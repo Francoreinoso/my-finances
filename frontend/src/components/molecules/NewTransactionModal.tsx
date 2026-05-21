@@ -2,10 +2,8 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Button } from '@/components/atoms/Button';
 import type { Account } from '@/types/account';
 import type { Category } from '@/types/category';
-import type { CreateTransactionInput } from '@/types/transaction';
+import type { CreateTransactionInput, TransactionType } from '@/types/transaction';
 import { todayISO } from '@/lib/format';
-
-type TxType = 'income' | 'expense';
 
 interface NewTransactionModalProps {
   accounts: Account[];
@@ -17,15 +15,23 @@ interface NewTransactionModalProps {
 const FIELD_CLASS =
   'rounded-md border border-border-default bg-bg-surface/60 px-3 py-2 text-text-primary placeholder:text-text-subtle focus:border-accent focus:outline-none';
 
+const TYPE_STYLES: Record<TransactionType, string> = {
+  expense: 'bg-danger/20 text-danger',
+  income: 'bg-success/20 text-success',
+  transfer: 'bg-accent/20 text-accent',
+};
+
 export function NewTransactionModal({
   accounts,
   categories,
   onClose,
   onSubmit,
 }: NewTransactionModalProps) {
-  const [type, setType] = useState<TxType>('expense');
+  const [type, setType] = useState<TransactionType>('expense');
   const [amount, setAmount] = useState('');
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? '');
+  const [fromAccountId, setFromAccountId] = useState(accounts[0]?.id ?? '');
+  const [toAccountId, setToAccountId] = useState(accounts[1]?.id ?? '');
   const [categoryId, setCategoryId] = useState('');
   const [date, setDate] = useState(todayISO());
   const [description, setDescription] = useState('');
@@ -42,13 +48,18 @@ export function NewTransactionModal({
     };
   }, [onClose]);
 
+  const isTransfer = type === 'transfer';
   const visibleCategories = categories.filter((c) => c.type === type);
   const amountNumber = Number(amount);
-  const canSubmit =
-    Number.isFinite(amountNumber) && amountNumber > 0 && accountId !== '' && !submitting;
+  const amountOk = Number.isFinite(amountNumber) && amountNumber > 0;
+  const sameAccount = isTransfer && fromAccountId !== '' && fromAccountId === toAccountId;
+  const accountsOk = isTransfer
+    ? fromAccountId !== '' && toAccountId !== '' && !sameAccount
+    : accountId !== '';
+  const canSubmit = amountOk && accountsOk && !submitting;
 
   // Al cambiar el tipo, la categoría elegida puede no aplicar al nuevo tipo.
-  const changeType = (next: TxType) => {
+  const changeType = (next: TransactionType) => {
     setType(next);
     setCategoryId('');
   };
@@ -58,14 +69,29 @@ export function NewTransactionModal({
     setSubmitting(true);
     setError(null);
     try {
-      await onSubmit({
-        date,
-        amount: amountNumber,
-        type,
-        accountId,
-        categoryId: categoryId === '' ? null : categoryId,
-        description: description.trim() === '' ? null : description.trim(),
-      });
+      const trimmed = description.trim();
+      const desc = trimmed === '' ? null : trimmed;
+      let input: CreateTransactionInput;
+      if (type === 'transfer') {
+        input = {
+          type: 'transfer',
+          date,
+          amount: amountNumber,
+          fromAccountId,
+          toAccountId,
+          description: desc,
+        };
+      } else {
+        input = {
+          type,
+          date,
+          amount: amountNumber,
+          accountId,
+          categoryId: categoryId === '' ? null : categoryId,
+          description: desc,
+        };
+      }
+      await onSubmit(input);
       onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'No se pudo guardar la transacción');
@@ -95,25 +121,19 @@ export function NewTransactionModal({
       >
         <h3 className="font-mono text-xl text-text-primary">Nueva transacción</h3>
 
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => changeType('expense')}
-            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              type === 'expense' ? 'bg-danger/20 text-danger' : 'bg-bg-elevated text-text-muted'
-            }`}
-          >
-            Gasto
-          </button>
-          <button
-            type="button"
-            onClick={() => changeType('income')}
-            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              type === 'income' ? 'bg-success/20 text-success' : 'bg-bg-elevated text-text-muted'
-            }`}
-          >
-            Ingreso
-          </button>
+        <div className="grid grid-cols-3 gap-2">
+          {(['expense', 'income', 'transfer'] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => changeType(t)}
+              className={`rounded-md px-2 py-2 text-sm font-medium transition-colors ${
+                type === t ? TYPE_STYLES[t] : 'bg-bg-elevated text-text-muted'
+              }`}
+            >
+              {t === 'expense' ? 'Gasto' : t === 'income' ? 'Ingreso' : 'Transferencia'}
+            </button>
+          ))}
         </div>
 
         <label className="flex flex-col gap-1 text-sm text-text-muted">
@@ -131,36 +151,73 @@ export function NewTransactionModal({
           />
         </label>
 
-        <label className="flex flex-col gap-1 text-sm text-text-muted">
-          Cuenta
-          <select
-            value={accountId}
-            onChange={(e) => setAccountId(e.target.value)}
-            className={FIELD_CLASS}
-          >
-            {accounts.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm text-text-muted">
-          Categoría <span className="text-text-subtle">(opcional)</span>
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className={FIELD_CLASS}
-          >
-            <option value="">Sin categoría</option>
-            {visibleCategories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        {isTransfer ? (
+          <>
+            <label className="flex flex-col gap-1 text-sm text-text-muted">
+              Cuenta origen
+              <select
+                value={fromAccountId}
+                onChange={(e) => setFromAccountId(e.target.value)}
+                className={FIELD_CLASS}
+              >
+                {accounts.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-sm text-text-muted">
+              Cuenta destino
+              <select
+                value={toAccountId}
+                onChange={(e) => setToAccountId(e.target.value)}
+                className={FIELD_CLASS}
+              >
+                {accounts.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {sameAccount && (
+              <p className="text-xs text-danger">Elegí una cuenta de destino distinta.</p>
+            )}
+          </>
+        ) : (
+          <>
+            <label className="flex flex-col gap-1 text-sm text-text-muted">
+              Cuenta
+              <select
+                value={accountId}
+                onChange={(e) => setAccountId(e.target.value)}
+                className={FIELD_CLASS}
+              >
+                {accounts.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-sm text-text-muted">
+              Categoría <span className="text-text-subtle">(opcional)</span>
+              <select
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                className={FIELD_CLASS}
+              >
+                <option value="">Sin categoría</option>
+                {visibleCategories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        )}
 
         <label className="flex flex-col gap-1 text-sm text-text-muted">
           Fecha
@@ -179,7 +236,7 @@ export function NewTransactionModal({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={280}
-            placeholder="Ej: Almuerzo"
+            placeholder="Ej: Aporte a Mudanza"
             className={FIELD_CLASS}
           />
         </label>

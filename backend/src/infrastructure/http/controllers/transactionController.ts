@@ -22,10 +22,24 @@ function parseLimit(raw: unknown): number | undefined {
 }
 
 /**
- * Adapta el body HTTP al input del dominio. En Fase 1 el cliente manda una
- * sola cuenta: en un ingreso es el destino, en un gasto es el origen.
+ * Adapta el body HTTP al input del dominio.
+ * - Transferencia: dos cuentas explícitas, sin categoría.
+ * - Ingreso/gasto: una sola cuenta — en un ingreso es el destino, en un
+ *   gasto es el origen.
  */
 function toCreateInput(body: CreateTransactionRequest): CreateTransactionInput {
+  if (body.type === 'transfer') {
+    const input: CreateTransactionInput = {
+      date: body.date,
+      amount: body.amount,
+      type: 'transfer',
+      fromAccountId: body.fromAccountId,
+      toAccountId: body.toAccountId,
+    };
+    if (body.description !== undefined) input.description = body.description;
+    return input;
+  }
+
   const input: CreateTransactionInput = {
     date: body.date,
     amount: body.amount,

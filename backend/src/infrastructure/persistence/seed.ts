@@ -27,7 +27,7 @@ const SEED_ACCOUNTS: NewAccountRow[] = [
   { id: 'acc_santander', name: 'Santander Débito', type: 'checking', currency: 'CLP', createdAt: NOW },
   { id: 'acc_risky', name: 'Fintual Risky Norris', type: 'investment', currency: 'CLP', createdAt: NOW },
   { id: 'acc_streep', name: 'Fintual Very Conservative Streep', type: 'savings', currency: 'CLP', createdAt: NOW },
-  { id: 'acc_dap', name: 'DAP UF Santander', type: 'savings', currency: 'UF', createdAt: NOW },
+  { id: 'acc_dap', name: 'DAP Santander', type: 'savings', currency: 'CLP', createdAt: NOW },
 ];
 
 const SEED_CATEGORIES: NewCategoryRow[] = [

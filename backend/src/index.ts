@@ -4,6 +4,7 @@ import { seedIfEmpty } from '@/infrastructure/persistence/seed.js';
 import { SqliteAccountRepository } from '@/infrastructure/persistence/SqliteAccountRepository.js';
 import { SqliteCategoryRepository } from '@/infrastructure/persistence/SqliteCategoryRepository.js';
 import { SqliteTransactionRepository } from '@/infrastructure/persistence/SqliteTransactionRepository.js';
+import { SqliteBucketRepository } from '@/infrastructure/persistence/SqliteBucketRepository.js';
 import { createApp } from '@/infrastructure/http/server.js';
 
 const PORT = Number(process.env['PORT'] ?? 4001);
@@ -18,6 +19,7 @@ const app = createApp({
   accountRepository: new SqliteAccountRepository(db),
   categoryRepository: new SqliteCategoryRepository(db),
   transactionRepository: new SqliteTransactionRepository(db),
+  bucketRepository: new SqliteBucketRepository(db),
   corsOrigin: FRONTEND_ORIGIN,
 });
 

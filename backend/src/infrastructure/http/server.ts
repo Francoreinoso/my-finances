@@ -3,18 +3,22 @@ import cors from 'cors';
 import type { AccountRepository } from '@/domain/account/AccountRepository.js';
 import type { CategoryRepository } from '@/domain/category/CategoryRepository.js';
 import type { TransactionRepository } from '@/domain/transaction/TransactionRepository.js';
+import type { BucketRepository } from '@/domain/bucket/BucketRepository.js';
 import { makeAccountController } from './controllers/accountController.js';
 import { makeAccountRouter } from './routes/accountRoutes.js';
 import { makeCategoryController } from './controllers/categoryController.js';
 import { makeCategoryRouter } from './routes/categoryRoutes.js';
 import { makeTransactionController } from './controllers/transactionController.js';
 import { makeTransactionRouter } from './routes/transactionRoutes.js';
+import { makeBucketController } from './controllers/bucketController.js';
+import { makeBucketRouter } from './routes/bucketRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 export interface ServerDeps {
   accountRepository: AccountRepository;
   categoryRepository: CategoryRepository;
   transactionRepository: TransactionRepository;
+  bucketRepository: BucketRepository;
   corsOrigin: string | string[];
 }
 
@@ -44,6 +48,9 @@ export function createApp(deps: ServerDeps): Express {
     deps.categoryRepository,
   );
   app.use('/api/transactions', makeTransactionRouter(transactionController));
+
+  const bucketController = makeBucketController(deps.bucketRepository, deps.accountRepository);
+  app.use('/api/buckets', makeBucketRouter(bucketController));
 
   app.use(errorHandler);
 

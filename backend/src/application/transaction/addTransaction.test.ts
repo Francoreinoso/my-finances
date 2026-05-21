@@ -80,4 +80,28 @@ describe('addTransaction', () => {
     ).rejects.toThrow();
     expect(await transactions.findRecent(10)).toHaveLength(0);
   });
+
+  it('crea y persiste una transferencia válida', async () => {
+    const tx = await addTransaction(transactions, accounts, categories, {
+      date: '2026-05-20',
+      amount: 80000,
+      type: 'transfer',
+      fromAccountId: 'acc_santander',
+      toAccountId: 'acc_dap',
+    });
+    expect(tx.type).toBe('transfer');
+    expect(await transactions.findRecent(10)).toHaveLength(1);
+  });
+
+  it('rechaza una transferencia con cuenta de destino inexistente', async () => {
+    await expect(
+      addTransaction(transactions, accounts, categories, {
+        date: '2026-05-20',
+        amount: 80000,
+        type: 'transfer',
+        fromAccountId: 'acc_santander',
+        toAccountId: 'acc_FANTASMA',
+      }),
+    ).rejects.toThrow(TransactionValidationError);
+  });
 });

@@ -6,6 +6,7 @@ import { seedIfEmpty } from '@/infrastructure/persistence/seed.js';
 import { SqliteAccountRepository } from '@/infrastructure/persistence/SqliteAccountRepository.js';
 import { SqliteCategoryRepository } from '@/infrastructure/persistence/SqliteCategoryRepository.js';
 import { SqliteTransactionRepository } from '@/infrastructure/persistence/SqliteTransactionRepository.js';
+import { SqliteBucketRepository } from '@/infrastructure/persistence/SqliteBucketRepository.js';
 import { createApp } from './server.js';
 
 describe('API HTTP', () => {
@@ -18,6 +19,7 @@ describe('API HTTP', () => {
       accountRepository: new SqliteAccountRepository(db),
       categoryRepository: new SqliteCategoryRepository(db),
       transactionRepository: new SqliteTransactionRepository(db),
+      bucketRepository: new SqliteBucketRepository(db),
       corsOrigin: '*',
     });
   });
@@ -94,5 +96,46 @@ describe('API HTTP', () => {
     const res = await request(app).get('/api/transactions');
     expect(res.status).toBe(200);
     expect(res.body).toHaveLength(1);
+  });
+
+  it('GET /api/buckets devuelve los 3 buckets con su progreso', async () => {
+    const res = await request(app).get('/api/buckets');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(3);
+    expect((res.body as { progress: number }[]).every((b) => b.progress === 0)).toBe(true);
+  });
+
+  it('POST /api/transactions crea una transferencia y mueve ambos balances', async () => {
+    await request(app).post('/api/transactions').send({
+      date: '2026-05-20',
+      amount: 100000,
+      type: 'income',
+      accountId: 'acc_santander',
+    });
+    const res = await request(app).post('/api/transactions').send({
+      date: '2026-05-20',
+      amount: 80000,
+      type: 'transfer',
+      fromAccountId: 'acc_santander',
+      toAccountId: 'acc_dap',
+    });
+    expect(res.status).toBe(201);
+
+    const accountsRes = await request(app).get('/api/accounts');
+    const byId = new Map(
+      (accountsRes.body as { id: string; balance: number }[]).map((a) => [a.id, a.balance]),
+    );
+    expect(byId.get('acc_santander')).toBe(20000);
+    expect(byId.get('acc_dap')).toBe(80000);
+  });
+
+  it('POST /api/transactions transferencia sin cuenta destino devuelve 400', async () => {
+    const res = await request(app).post('/api/transactions').send({
+      date: '2026-05-20',
+      amount: 80000,
+      type: 'transfer',
+      fromAccountId: 'acc_santander',
+    });
+    expect(res.status).toBe(400);
   });
 });
