@@ -18,7 +18,7 @@ interface TransactionTableProps {
 
 /** Grilla de columnas compartida entre el encabezado y cada fila. */
 const GRID =
-  'grid grid-cols-[5.5rem_minmax(0,1fr)_minmax(0,1.5fr)_7rem_7rem_6rem] items-center gap-3 px-3';
+  'grid grid-cols-[5.5rem_minmax(0,1fr)_minmax(0,1.5fr)_7rem_7rem_8rem] items-center gap-3 px-3';
 const ROW_HEIGHT = 44;
 
 /**

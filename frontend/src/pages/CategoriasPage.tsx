@@ -3,6 +3,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { Button } from '@/components/atoms/Button';
 import { CategoryRow } from '@/components/molecules/CategoryRow';
 import { EmptyState } from '@/components/molecules/EmptyState';
+import { PageSkeleton } from '@/components/molecules/PageSkeleton';
 import { CategoryFormModal } from '@/components/molecules/CategoryFormModal';
 import type { Category } from '@/types/category';
 
@@ -28,7 +29,7 @@ export function CategoriasPage() {
         </Button>
       </header>
 
-      {status === 'loading' && <p className="text-text-muted">Cargando…</p>}
+      {status === 'loading' && <PageSkeleton variant="rows" />}
 
       {status === 'error' && (
         <div

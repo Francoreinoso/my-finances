@@ -1,3 +1,4 @@
+import { Button } from '@/components/atoms/Button';
 import type { Currency } from '@/types/account';
 import type { Bucket } from '@/types/bucket';
 import { formatMoney } from '@/lib/format';
@@ -41,7 +42,7 @@ export function BucketProgressCard({ bucket, onEdit }: BucketProgressCardProps) 
 
   return (
     <div className="rounded-lg border border-border-default bg-bg-surface/70 p-5 backdrop-blur-sm">
-      <div className="flex items-baseline justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <h3 className="min-w-0 truncate font-medium text-text-primary" title={name}>
           {name}
         </h3>
@@ -49,13 +50,9 @@ export function BucketProgressCard({ bucket, onEdit }: BucketProgressCardProps) 
           {targetDate !== null && (
             <span className="font-mono text-xs text-text-subtle">meta: {targetDate}</span>
           )}
-          <button
-            type="button"
-            onClick={onEdit}
-            className="text-xs text-text-muted hover:text-accent"
-          >
+          <Button variant="ghost" onClick={onEdit}>
             Editar
-          </button>
+          </Button>
         </div>
       </div>
 

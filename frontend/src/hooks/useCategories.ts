@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { categoryClient } from '@/api/categoryClient';
+import { useToasts } from '@/stores/useToasts';
 import type { Category, CreateCategoryInput, CategoryChanges } from '@/types/category';
 
 export type CategoriesStatus = 'loading' | 'ready' | 'error';
@@ -21,6 +22,7 @@ export function useCategories(): UseCategories {
   const [categories, setCategories] = useState<Category[]>([]);
   const [status, setStatus] = useState<CategoriesStatus>('loading');
   const [error, setError] = useState<string | null>(null);
+  const notify = useToasts((state) => state.notify);
 
   const load = useCallback(async () => {
     setStatus('loading');
@@ -39,15 +41,23 @@ export function useCategories(): UseCategories {
   }, [load]);
 
   // El error se propaga a propósito: el modal lo muestra y se queda abierto.
-  const create = useCallback(async (input: CreateCategoryInput) => {
-    await categoryClient.create(input);
-    setCategories(await categoryClient.list());
-  }, []);
+  const create = useCallback(
+    async (input: CreateCategoryInput) => {
+      await categoryClient.create(input);
+      setCategories(await categoryClient.list());
+      notify('Categoría creada');
+    },
+    [notify],
+  );
 
-  const update = useCallback(async (id: string, changes: CategoryChanges) => {
-    await categoryClient.update(id, changes);
-    setCategories(await categoryClient.list());
-  }, []);
+  const update = useCallback(
+    async (id: string, changes: CategoryChanges) => {
+      await categoryClient.update(id, changes);
+      setCategories(await categoryClient.list());
+      notify('Categoría actualizada');
+    },
+    [notify],
+  );
 
   return { categories, status, error, create, update };
 }

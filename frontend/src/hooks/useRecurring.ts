@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { recurringClient } from '@/api/recurringClient';
+import { useToasts } from '@/stores/useToasts';
 import type { RecurringTransfer, RecurringTransferChanges } from '@/types/recurring';
 
 export type RecurringStatus = 'loading' | 'ready' | 'error';
@@ -21,6 +22,7 @@ export function useRecurring(): UseRecurring {
   const [recurring, setRecurring] = useState<RecurringTransfer[]>([]);
   const [status, setStatus] = useState<RecurringStatus>('loading');
   const [error, setError] = useState<string | null>(null);
+  const notify = useToasts((state) => state.notify);
 
   const load = useCallback(async () => {
     setStatus('loading');
@@ -39,15 +41,23 @@ export function useRecurring(): UseRecurring {
   }, [load]);
 
   // confirm y update propagan el error a propósito: la card lo muestra.
-  const confirm = useCallback(async (id: string) => {
-    await recurringClient.confirm(id);
-    setRecurring(await recurringClient.list());
-  }, []);
+  const confirm = useCallback(
+    async (id: string) => {
+      await recurringClient.confirm(id);
+      setRecurring(await recurringClient.list());
+      notify('Aporte confirmado');
+    },
+    [notify],
+  );
 
-  const update = useCallback(async (id: string, changes: RecurringTransferChanges) => {
-    await recurringClient.update(id, changes);
-    setRecurring(await recurringClient.list());
-  }, []);
+  const update = useCallback(
+    async (id: string, changes: RecurringTransferChanges) => {
+      await recurringClient.update(id, changes);
+      setRecurring(await recurringClient.list());
+      notify('Aporte actualizado');
+    },
+    [notify],
+  );
 
   return { recurring, status, error, confirm, update };
 }

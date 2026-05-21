@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { bucketClient } from '@/api/bucketClient';
 import { accountClient } from '@/api/accountClient';
+import { useToasts } from '@/stores/useToasts';
 import type { Bucket, CreateBucketInput, BucketChanges } from '@/types/bucket';
 import type { Account } from '@/types/account';
 
@@ -28,6 +29,7 @@ export function useBuckets(): UseBuckets {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [status, setStatus] = useState<BucketsStatus>('loading');
   const [error, setError] = useState<string | null>(null);
+  const notify = useToasts((state) => state.notify);
 
   const load = useCallback(async () => {
     setStatus('loading');
@@ -56,16 +58,18 @@ export function useBuckets(): UseBuckets {
     async (input: CreateBucketInput) => {
       await bucketClient.create(input);
       await reloadBuckets();
+      notify('Bucket creado');
     },
-    [reloadBuckets],
+    [reloadBuckets, notify],
   );
 
   const update = useCallback(
     async (id: string, changes: BucketChanges) => {
       await bucketClient.update(id, changes);
       await reloadBuckets();
+      notify('Bucket actualizado');
     },
-    [reloadBuckets],
+    [reloadBuckets, notify],
   );
 
   return { buckets, accounts, status, error, create, update };

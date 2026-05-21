@@ -6,6 +6,7 @@ import { TransactionTable } from '@/components/organisms/TransactionTable';
 import { TransactionFilters } from '@/components/molecules/TransactionFilters';
 import { NewTransactionModal } from '@/components/molecules/NewTransactionModal';
 import { EmptyState } from '@/components/molecules/EmptyState';
+import { PageSkeleton } from '@/components/molecules/PageSkeleton';
 import {
   EMPTY_FILTER,
   filterTransactions,
@@ -61,7 +62,7 @@ export function TransaccionesPage() {
         </Button>
       </header>
 
-      {status === 'loading' && <p className="text-text-muted">Cargando…</p>}
+      {status === 'loading' && <PageSkeleton variant="table" />}
 
       {status === 'error' && (
         <div

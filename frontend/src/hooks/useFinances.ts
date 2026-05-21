@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { accountClient } from '@/api/accountClient';
 import { categoryClient } from '@/api/categoryClient';
 import { transactionClient } from '@/api/transactionClient';
+import { useToasts } from '@/stores/useToasts';
 import type { Account } from '@/types/account';
 import type { Category } from '@/types/category';
 import type {
@@ -37,6 +38,7 @@ export function useFinances(): UseFinances {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [status, setStatus] = useState<FinancesStatus>('loading');
   const [error, setError] = useState<string | null>(null);
+  const notify = useToasts((state) => state.notify);
 
   const loadAll = useCallback(async () => {
     setStatus('loading');
@@ -73,24 +75,27 @@ export function useFinances(): UseFinances {
     async (input: CreateTransactionInput) => {
       await transactionClient.create(input);
       await reloadCashState();
+      notify('Transacción creada');
     },
-    [reloadCashState],
+    [reloadCashState, notify],
   );
 
   const updateTransaction = useCallback(
     async (id: string, changes: TransactionChanges) => {
       await transactionClient.update(id, changes);
       await reloadCashState();
+      notify('Transacción actualizada');
     },
-    [reloadCashState],
+    [reloadCashState, notify],
   );
 
   const deleteTransaction = useCallback(
     async (id: string) => {
       await transactionClient.remove(id);
       await reloadCashState();
+      notify('Transacción eliminada');
     },
-    [reloadCashState],
+    [reloadCashState, notify],
   );
 
   return {

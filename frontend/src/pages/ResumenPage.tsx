@@ -1,6 +1,7 @@
 import { useMonthlySummary } from '@/hooks/useMonthlySummary';
 import { SummaryStat } from '@/components/molecules/SummaryStat';
 import { CategoryDonut } from '@/components/molecules/CategoryDonut';
+import { PageSkeleton } from '@/components/molecules/PageSkeleton';
 import { formatMoney, formatMonth } from '@/lib/format';
 
 const NAV_BUTTON =
@@ -41,7 +42,7 @@ export function ResumenPage() {
         </div>
       </header>
 
-      {status === 'loading' && <p className="text-text-muted">Cargando…</p>}
+      {status === 'loading' && <PageSkeleton variant="summary" />}
 
       {status === 'error' && (
         <div

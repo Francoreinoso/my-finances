@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Sidebar } from '@/components/organisms/Sidebar';
+import { Toaster } from '@/components/organisms/Toaster';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -52,6 +53,8 @@ export function AppLayout({ children }: AppLayoutProps) {
       >
         {children}
       </main>
+
+      <Toaster />
     </div>
   );
 }

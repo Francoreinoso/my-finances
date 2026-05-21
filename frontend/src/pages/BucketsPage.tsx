@@ -3,6 +3,7 @@ import { useBuckets } from '@/hooks/useBuckets';
 import { Button } from '@/components/atoms/Button';
 import { BucketProgressCard } from '@/components/molecules/BucketProgressCard';
 import { EmptyState } from '@/components/molecules/EmptyState';
+import { PageSkeleton } from '@/components/molecules/PageSkeleton';
 import { BucketFormModal } from '@/components/molecules/BucketFormModal';
 import type { Bucket } from '@/types/bucket';
 
@@ -23,7 +24,7 @@ export function BucketsPage() {
         </Button>
       </header>
 
-      {status === 'loading' && <p className="text-text-muted">Cargando…</p>}
+      {status === 'loading' && <PageSkeleton variant="cards" />}
 
       {status === 'error' && (
         <div

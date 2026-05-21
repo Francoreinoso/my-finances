@@ -1,4 +1,5 @@
 import { type CSSProperties } from 'react';
+import { Button } from '@/components/atoms/Button';
 import type { Transaction, TransactionType } from '@/types/transaction';
 import type { Category } from '@/types/category';
 import type { Currency } from '@/types/account';
@@ -90,21 +91,13 @@ export function TransactionRow({
         {SIGN[transaction.type]}
         {formatMoney(transaction.amount, currency)}
       </span>
-      <span role="cell" className="flex justify-end gap-3">
-        <button
-          type="button"
-          onClick={onEdit}
-          className="text-xs text-text-muted hover:text-accent"
-        >
+      <span role="cell" className="flex justify-end gap-2">
+        <Button variant="ghost" size="sm" className="h-11" onClick={onEdit}>
           Editar
-        </button>
-        <button
-          type="button"
-          onClick={onDelete}
-          className="text-xs text-text-muted hover:text-danger"
-        >
+        </Button>
+        <Button variant="danger" size="sm" className="h-11" onClick={onDelete}>
           Borrar
-        </button>
+        </Button>
       </span>
     </div>
   );

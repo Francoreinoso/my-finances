@@ -1,3 +1,4 @@
+import { Button } from '@/components/atoms/Button';
 import type { Category } from '@/types/category';
 
 interface CategoryRowProps {
@@ -19,13 +20,9 @@ export function CategoryRow({ category, onEdit }: CategoryRowProps) {
       <span className="text-xs uppercase tracking-wider text-text-subtle">
         {category.type === 'income' ? 'ingreso' : 'gasto'}
       </span>
-      <button
-        type="button"
-        onClick={onEdit}
-        className="text-xs text-text-muted hover:text-accent"
-      >
+      <Button variant="ghost" className="shrink-0" onClick={onEdit}>
         Editar
-      </button>
+      </Button>
     </div>
   );
 }

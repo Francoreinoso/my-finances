@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/atoms/Button';
 import { backupClient } from '@/api/backupClient';
 import { API_BASE_URL } from '@/api/http';
+import { useToasts } from '@/stores/useToasts';
 
 type BackupState =
   | { status: 'idle' }
@@ -11,12 +12,14 @@ type BackupState =
 
 export function DatosPage() {
   const [backup, setBackup] = useState<BackupState>({ status: 'idle' });
+  const notify = useToasts((state) => state.notify);
 
   const handleBackup = async () => {
     setBackup({ status: 'working' });
     try {
       const result = await backupClient.create();
       setBackup({ status: 'done', fileName: result.fileName });
+      notify(`Backup creado: ${result.fileName}`);
     } catch (e) {
       setBackup({
         status: 'error',

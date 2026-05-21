@@ -1,6 +1,7 @@
 import { useRecurring } from '@/hooks/useRecurring';
 import { RecurringTransferCard } from '@/components/molecules/RecurringTransferCard';
 import { EmptyState } from '@/components/molecules/EmptyState';
+import { PageSkeleton } from '@/components/molecules/PageSkeleton';
 
 export function RecurrentesPage() {
   const { recurring, status, error, confirm, update } = useRecurring();
@@ -18,7 +19,7 @@ export function RecurrentesPage() {
         </p>
       </header>
 
-      {status === 'loading' && <p className="text-text-muted">Cargando…</p>}
+      {status === 'loading' && <PageSkeleton variant="cards" />}
 
       {status === 'error' && (
         <div

@@ -38,7 +38,7 @@ export function Modal({ title, onClose, size = 'md', children }: ModalProps) {
       }}
     >
       <div
-        className={`flex w-full ${SIZE_CLASS[size]} flex-col gap-4 rounded-lg border border-border-default bg-bg-surface p-6 shadow-2xl`}
+        className={`mf-fade-in-up flex w-full ${SIZE_CLASS[size]} flex-col gap-4 rounded-lg border border-border-default bg-bg-surface p-6 shadow-2xl`}
       >
         <h3 className="font-mono text-xl text-text-primary">{title}</h3>
         {children}
