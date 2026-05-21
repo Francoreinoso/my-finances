@@ -9,12 +9,12 @@ export interface NavItem {
 }
 
 /**
- * Vistas de my-finanzas. Transacciones y Buckets están habilitadas (Fases 1 y 2);
- * Recurrentes y Resumen se muestran como "(pronto)" hasta sus fases.
+ * Vistas de my-finanzas. Transacciones, Buckets y Recurrentes están habilitadas
+ * (Fases 1, 2 y 3); Resumen se muestra como "(pronto)" hasta la Fase 4.
  */
 export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'transacciones', label: 'Transacciones', icon: Receipt, path: '/', enabled: true },
   { id: 'buckets', label: 'Buckets', icon: PiggyBank, path: '/buckets', enabled: true },
-  { id: 'recurrentes', label: 'Recurrentes', icon: Repeat, path: '/recurrentes', enabled: false },
+  { id: 'recurrentes', label: 'Recurrentes', icon: Repeat, path: '/recurrentes', enabled: true },
   { id: 'resumen', label: 'Resumen', icon: ChartPie, path: '/resumen', enabled: false },
 ] as const;

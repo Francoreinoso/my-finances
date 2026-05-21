@@ -48,7 +48,7 @@ const SEED_BUCKETS: NewBucketRow[] = [
 ];
 
 // Fase 1: sueldo $250.000 → $80K mudanza + $30K emergencia + $30K largo plazo.
-// dayOfMonth = 5 es una ASUNCIÓN (día de pago). Editable desde la app.
+// dayOfMonth = 8: el día de pago del usuario.
 const SEED_RECURRING: NewRecurringTransferRow[] = [
   {
     id: 'rec_mudanza',
@@ -57,8 +57,8 @@ const SEED_RECURRING: NewRecurringTransferRow[] = [
     toAccountId: 'acc_dap',
     amount: 80_000,
     bucketId: 'bk_mudanza',
-    dayOfMonth: 5,
-    nextDueDate: '2026-06-05',
+    dayOfMonth: 8,
+    nextDueDate: '2026-06-08',
     isActive: true,
   },
   {
@@ -68,8 +68,8 @@ const SEED_RECURRING: NewRecurringTransferRow[] = [
     toAccountId: 'acc_streep',
     amount: 30_000,
     bucketId: 'bk_emergencia',
-    dayOfMonth: 5,
-    nextDueDate: '2026-06-05',
+    dayOfMonth: 8,
+    nextDueDate: '2026-06-08',
     isActive: true,
   },
   {
@@ -79,8 +79,8 @@ const SEED_RECURRING: NewRecurringTransferRow[] = [
     toAccountId: 'acc_risky',
     amount: 30_000,
     bucketId: 'bk_largoplazo',
-    dayOfMonth: 5,
-    nextDueDate: '2026-06-05',
+    dayOfMonth: 8,
+    nextDueDate: '2026-06-08',
     isActive: true,
   },
 ];

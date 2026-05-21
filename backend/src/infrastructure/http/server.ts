@@ -4,6 +4,7 @@ import type { AccountRepository } from '@/domain/account/AccountRepository.js';
 import type { CategoryRepository } from '@/domain/category/CategoryRepository.js';
 import type { TransactionRepository } from '@/domain/transaction/TransactionRepository.js';
 import type { BucketRepository } from '@/domain/bucket/BucketRepository.js';
+import type { RecurringTransferRepository } from '@/domain/recurring/RecurringTransferRepository.js';
 import { makeAccountController } from './controllers/accountController.js';
 import { makeAccountRouter } from './routes/accountRoutes.js';
 import { makeCategoryController } from './controllers/categoryController.js';
@@ -12,6 +13,8 @@ import { makeTransactionController } from './controllers/transactionController.j
 import { makeTransactionRouter } from './routes/transactionRoutes.js';
 import { makeBucketController } from './controllers/bucketController.js';
 import { makeBucketRouter } from './routes/bucketRoutes.js';
+import { makeRecurringController } from './controllers/recurringController.js';
+import { makeRecurringRouter } from './routes/recurringRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 export interface ServerDeps {
@@ -19,6 +22,7 @@ export interface ServerDeps {
   categoryRepository: CategoryRepository;
   transactionRepository: TransactionRepository;
   bucketRepository: BucketRepository;
+  recurringRepository: RecurringTransferRepository;
   corsOrigin: string | string[];
 }
 
@@ -51,6 +55,9 @@ export function createApp(deps: ServerDeps): Express {
 
   const bucketController = makeBucketController(deps.bucketRepository, deps.accountRepository);
   app.use('/api/buckets', makeBucketRouter(bucketController));
+
+  const recurringController = makeRecurringController(deps.recurringRepository);
+  app.use('/api/recurring', makeRecurringRouter(recurringController));
 
   app.use(errorHandler);
 

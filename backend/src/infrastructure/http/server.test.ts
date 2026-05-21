@@ -7,6 +7,7 @@ import { SqliteAccountRepository } from '@/infrastructure/persistence/SqliteAcco
 import { SqliteCategoryRepository } from '@/infrastructure/persistence/SqliteCategoryRepository.js';
 import { SqliteTransactionRepository } from '@/infrastructure/persistence/SqliteTransactionRepository.js';
 import { SqliteBucketRepository } from '@/infrastructure/persistence/SqliteBucketRepository.js';
+import { SqliteRecurringTransferRepository } from '@/infrastructure/persistence/SqliteRecurringTransferRepository.js';
 import { createApp } from './server.js';
 
 describe('API HTTP', () => {
@@ -20,6 +21,7 @@ describe('API HTTP', () => {
       categoryRepository: new SqliteCategoryRepository(db),
       transactionRepository: new SqliteTransactionRepository(db),
       bucketRepository: new SqliteBucketRepository(db),
+      recurringRepository: new SqliteRecurringTransferRepository(db),
       corsOrigin: '*',
     });
   });
@@ -137,5 +139,16 @@ describe('API HTTP', () => {
       fromAccountId: 'acc_santander',
     });
     expect(res.status).toBe(400);
+  });
+
+  it('GET /api/recurring devuelve los 3 aportes recurrentes', async () => {
+    const res = await request(app).get('/api/recurring');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(3);
+  });
+
+  it('POST /api/recurring/:id/confirm de un aporte inexistente devuelve 404', async () => {
+    const res = await request(app).post('/api/recurring/rec_FANTASMA/confirm');
+    expect(res.status).toBe(404);
   });
 });
