@@ -6,11 +6,11 @@
 > **P1 (8 items)**. Detalle completo en engram, topics:
 > `design/frontend-audit`, `design/p0-implementation`, `design/p1-implementation`.
 
-## ⚠️ Antes que nada
+## ⚠️ Estado
 
-- **Nada está commiteado.** Toda la sesión quedó en el working tree — revisar y commitear.
-- Dependencia nueva agregada: `@tanstack/react-virtual@3.13.25`.
-- Tests: el proyecto pasó de **0 a 25** tests, todos en verde.
+- P0, P1 y P2 del audit están **implementados** (sesión 2026-05-21).
+- Dependencia agregada en P1: `@tanstack/react-virtual@3.13.25`.
+- Tests: el proyecto pasó de **0 a 38** tests, todos en verde.
   Verificar con `pnpm test` y `pnpm exec tsc --noEmit -p tsconfig.app.json`.
 
 ## 1. Verificación visual pendiente
@@ -23,19 +23,26 @@ Levantar `pnpm dev` y verificar a ojo:
 - Filtros por mes / tipo / categoría.
 - Modales de editar y borrar (ahora viven en `TransactionTable`, no en la fila).
 - Que las fuentes (JetBrains Mono), el `color-scheme: dark` y el contraste se vean OK.
+- **P2**: los skeletons de carga — que cada variante reserve el layout sin salto.
+- **P2**: los toasts — que aparezcan abajo a la derecha al crear/editar/confirmar
+  y al crear un backup, y que se auto-descarten a los 4 s.
 
-## 2. P2 del audit — polish (sin empezar)
+## 2. P2 del audit — polish (hecho, salvo drawer)
 
-- [ ] **Skeletons de carga** — hoy las páginas muestran `"Cargando…"` en texto
-      plano. Reemplazar por skeletons que reserven el layout (evita layout shift).
-- [ ] **Feedback de éxito + `aria-live`** — no hay confirmación al crear/editar/
-      confirmar. El backup en `DatosPage` tampoco se anuncia a lectores de pantalla.
-- [ ] **Touch targets** — los botones "Editar"/"Borrar" (`text-xs`) están por
-      debajo de los 44×44px recomendados. Agrandar el área tocable.
-- [ ] **Drawer mobile** — el sidebar `w-60` no colapsa a drawer en pantallas
-      chicas (baja prioridad si la app es solo de escritorio).
-- [ ] **CSS muerto** — `mf-fade-in-up` está definido en `frontend/src/styles/globals.css`
-      pero no se usa en ningún componente. Usarlo o borrarlo.
+- [x] **Skeletons de carga** — componente `PageSkeleton` (variantes
+      `cards`/`rows`/`table`/`summary`) reemplaza el texto `"Cargando…"` en las
+      5 páginas. Reserva el layout y expone `role="status"` + texto `sr-only`.
+- [x] **Feedback de éxito + `aria-live`** — store de Zustand `useToasts` (el
+      primer store del proyecto) + organismo `Toaster`. Cada toast es su propia
+      región viva: `role="status"` (éxito) / `role="alert"` (error). `notify`
+      wireado en los 4 hooks de datos y en el backup de `DatosPage`.
+- [x] **Touch targets** — los 4 botones `text-xs` Editar/Borrar migraron al
+      átomo `Button` (nueva prop `size`). En la tabla virtualizada ocupan los
+      44px de alto de la fila.
+- [~] **Drawer mobile** — descartado: la app es solo de escritorio (decisión
+      2026-05-21). Fuera de alcance.
+- [x] **CSS muerto** — `mf-fade-in-up` ahora anima la entrada del `Modal` y de
+      cada toast.
 - [x] ~~Hover en filas de tabla~~ — hecho: `TransactionRow` ya tiene
       `hover:bg-bg-elevated/40` (entró con #13).
 
