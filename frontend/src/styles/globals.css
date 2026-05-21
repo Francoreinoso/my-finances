@@ -13,6 +13,12 @@ body,
   min-height: 100vh;
 }
 
+/* La app es íntegramente oscura: que los controles nativos (select, input
+   date/color, scrollbars) usen el chrome oscuro del SO en vez del claro. */
+html {
+  color-scheme: dark;
+}
+
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
