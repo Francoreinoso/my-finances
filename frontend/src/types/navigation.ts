@@ -1,4 +1,4 @@
-import { Receipt, PiggyBank, Repeat, ChartPie, type Icon } from '@phosphor-icons/react';
+import { Receipt, PiggyBank, Repeat, ChartPie, Tag, type Icon } from '@phosphor-icons/react';
 
 export interface NavItem {
   id: string;
@@ -8,10 +8,11 @@ export interface NavItem {
   enabled: boolean;
 }
 
-/** Vistas de my-finanzas. Las cuatro habilitadas (Fases 1 a 4). */
+/** Vistas de my-finanzas. */
 export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'transacciones', label: 'Transacciones', icon: Receipt, path: '/', enabled: true },
   { id: 'buckets', label: 'Buckets', icon: PiggyBank, path: '/buckets', enabled: true },
   { id: 'recurrentes', label: 'Recurrentes', icon: Repeat, path: '/recurrentes', enabled: true },
   { id: 'resumen', label: 'Resumen', icon: ChartPie, path: '/resumen', enabled: true },
+  { id: 'categorias', label: 'Categorías', icon: Tag, path: '/categorias', enabled: true },
 ] as const;

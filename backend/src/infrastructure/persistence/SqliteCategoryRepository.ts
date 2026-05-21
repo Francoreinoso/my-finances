@@ -25,4 +25,22 @@ export class SqliteCategoryRepository implements CategoryRepository {
     const row = this.db.select().from(categories).where(eq(categories.id, id)).get();
     return Promise.resolve(row ? toCategory(row) : null);
   }
+
+  save(category: Category): Promise<void> {
+    const values = {
+      id: category.id,
+      name: category.name,
+      type: category.type,
+      color: category.color,
+    };
+    this.db
+      .insert(categories)
+      .values(values)
+      .onConflictDoUpdate({
+        target: categories.id,
+        set: { name: values.name, type: values.type, color: values.color },
+      })
+      .run();
+    return Promise.resolve();
+  }
 }

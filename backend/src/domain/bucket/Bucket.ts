@@ -2,7 +2,7 @@ import type { Currency } from '@/domain/account/Account.js';
 
 /**
  * Un bucket es una meta de ahorro: un nombre, un monto objetivo y la cuenta
- * donde vive esa plata. Modelo de lectura — en Fase 1/2 viene del seed.
+ * donde vive esa plata.
  */
 export interface Bucket {
   id: string;
@@ -20,4 +20,20 @@ export interface Bucket {
 export interface BucketWithProgress extends Bucket {
   progress: number;
   currency: Currency;
+}
+
+/** Datos para crear un bucket nuevo (el id lo genera el caso de uso). */
+export interface CreateBucketInput {
+  name: string;
+  targetAmount: number | null;
+  targetDate: string | null;
+  accountId: string | null;
+}
+
+/** Campos editables de un bucket. */
+export interface BucketChanges {
+  name?: string;
+  targetAmount?: number | null;
+  targetDate?: string | null;
+  accountId?: string | null;
 }

@@ -13,3 +13,14 @@ export interface Bucket {
   progress: number;
   currency: Currency;
 }
+
+/** Datos para crear un bucket (body de POST). */
+export interface CreateBucketInput {
+  name: string;
+  targetAmount: number | null;
+  targetDate: string | null;
+  accountId: string | null;
+}
+
+/** Campos editables de un bucket (body de PATCH). */
+export type BucketChanges = Partial<CreateBucketInput>;

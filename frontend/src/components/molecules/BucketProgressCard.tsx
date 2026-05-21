@@ -30,7 +30,12 @@ function ProgressBar({
   );
 }
 
-export function BucketProgressCard({ bucket }: { bucket: Bucket }) {
+interface BucketProgressCardProps {
+  bucket: Bucket;
+  onEdit: () => void;
+}
+
+export function BucketProgressCard({ bucket, onEdit }: BucketProgressCardProps) {
   const { name, targetAmount, targetDate, progress, currency } = bucket;
   const hasTarget = targetAmount !== null && targetAmount > 0;
 
@@ -38,9 +43,18 @@ export function BucketProgressCard({ bucket }: { bucket: Bucket }) {
     <div className="rounded-lg border border-border-default bg-bg-surface/70 p-5 backdrop-blur-sm">
       <div className="flex items-baseline justify-between gap-3">
         <h3 className="font-medium text-text-primary">{name}</h3>
-        {targetDate !== null && (
-          <span className="font-mono text-xs text-text-subtle">meta: {targetDate}</span>
-        )}
+        <div className="flex items-center gap-3">
+          {targetDate !== null && (
+            <span className="font-mono text-xs text-text-subtle">meta: {targetDate}</span>
+          )}
+          <button
+            type="button"
+            onClick={onEdit}
+            className="text-xs text-text-muted hover:text-accent"
+          >
+            Editar
+          </button>
+        </div>
       </div>
 
       <p className="mt-2 font-mono text-lg text-text-primary">

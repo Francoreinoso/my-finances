@@ -223,4 +223,32 @@ describe('API HTTP', () => {
     const res = await request(app).delete('/api/transactions/tx_FANTASMA');
     expect(res.status).toBe(404);
   });
+
+  it('POST /api/buckets crea un bucket', async () => {
+    const res = await request(app)
+      .post('/api/buckets')
+      .send({ name: 'Viaje', targetAmount: 800000, targetDate: null, accountId: null });
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({ name: 'Viaje' });
+  });
+
+  it('PATCH /api/buckets/:id inexistente devuelve 404', async () => {
+    const res = await request(app).patch('/api/buckets/bk_FANTASMA').send({ name: 'x' });
+    expect(res.status).toBe(404);
+  });
+
+  it('POST /api/categories crea una categoría', async () => {
+    const res = await request(app)
+      .post('/api/categories')
+      .send({ name: 'Mascotas', type: 'expense', color: '#ff00ff' });
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({ name: 'Mascotas', type: 'expense' });
+  });
+
+  it('POST /api/categories con color inválido devuelve 400', async () => {
+    const res = await request(app)
+      .post('/api/categories')
+      .send({ name: 'X', type: 'expense', color: 'rojo' });
+    expect(res.status).toBe(400);
+  });
 });

@@ -8,6 +8,8 @@ import {
   RecurringTransferNotPendingError,
   RecurringTransferValidationError,
 } from '@/domain/recurring/errors.js';
+import { BucketNotFoundError } from '@/domain/bucket/errors.js';
+import { CategoryNotFoundError } from '@/domain/category/errors.js';
 import { QueryValidationError } from '@/infrastructure/http/errors.js';
 
 /**
@@ -26,16 +28,14 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     return;
   }
 
-  if (err instanceof TransactionNotFoundError) {
+  if (
+    err instanceof TransactionNotFoundError ||
+    err instanceof RecurringTransferNotFoundError ||
+    err instanceof BucketNotFoundError ||
+    err instanceof CategoryNotFoundError
+  ) {
     res.status(404).json({
-      error: { code: 'TRANSACTION_NOT_FOUND', message: err.message },
-    });
-    return;
-  }
-
-  if (err instanceof RecurringTransferNotFoundError) {
-    res.status(404).json({
-      error: { code: 'RECURRING_NOT_FOUND', message: err.message },
+      error: { code: 'NOT_FOUND', message: err.message },
     });
     return;
   }

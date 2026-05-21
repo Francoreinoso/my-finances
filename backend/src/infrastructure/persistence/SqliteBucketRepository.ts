@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import type { Bucket } from '@/domain/bucket/Bucket.js';
 import type { BucketRepository } from '@/domain/bucket/BucketRepository.js';
 import { buckets, type BucketRow } from './schema.js';
@@ -19,5 +20,34 @@ export class SqliteBucketRepository implements BucketRepository {
   findAll(): Promise<Bucket[]> {
     const rows = this.db.select().from(buckets).all();
     return Promise.resolve(rows.map(toBucket));
+  }
+
+  findById(id: string): Promise<Bucket | null> {
+    const row = this.db.select().from(buckets).where(eq(buckets.id, id)).get();
+    return Promise.resolve(row ? toBucket(row) : null);
+  }
+
+  save(bucket: Bucket): Promise<void> {
+    const values = {
+      id: bucket.id,
+      name: bucket.name,
+      targetAmount: bucket.targetAmount,
+      targetDate: bucket.targetDate,
+      accountId: bucket.accountId,
+    };
+    this.db
+      .insert(buckets)
+      .values(values)
+      .onConflictDoUpdate({
+        target: buckets.id,
+        set: {
+          name: values.name,
+          targetAmount: values.targetAmount,
+          targetDate: values.targetDate,
+          accountId: values.accountId,
+        },
+      })
+      .run();
+    return Promise.resolve();
   }
 }
