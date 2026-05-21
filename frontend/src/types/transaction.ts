@@ -37,3 +37,11 @@ export interface TransferInput {
 
 /** Unión discriminada por `type` — refleja el schema del backend. */
 export type CreateTransactionInput = CashflowInput | TransferInput;
+
+/** Campos editables de una transacción (body de PATCH). El tipo y las cuentas no se editan. */
+export interface TransactionChanges {
+  amount?: number;
+  date?: string;
+  categoryId?: string | null;
+  description?: string | null;
+}

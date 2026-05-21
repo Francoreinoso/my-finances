@@ -193,4 +193,34 @@ describe('API HTTP', () => {
     const res = await request(app).patch('/api/recurring/rec_FANTASMA').send({ amount: 1 });
     expect(res.status).toBe(404);
   });
+
+  it('PATCH /api/transactions/:id edita una transacción', async () => {
+    const created = await request(app).post('/api/transactions').send({
+      type: 'expense',
+      date: '2026-05-10',
+      amount: 5500,
+      accountId: 'acc_santander',
+    });
+    const id = (created.body as { id: string }).id;
+    const res = await request(app).patch(`/api/transactions/${id}`).send({ amount: 5000 });
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ amount: 5000 });
+  });
+
+  it('DELETE /api/transactions/:id borra una transacción', async () => {
+    const created = await request(app).post('/api/transactions').send({
+      type: 'expense',
+      date: '2026-05-10',
+      amount: 5500,
+      accountId: 'acc_santander',
+    });
+    const id = (created.body as { id: string }).id;
+    const res = await request(app).delete(`/api/transactions/${id}`);
+    expect(res.status).toBe(204);
+  });
+
+  it('DELETE /api/transactions/:id inexistente devuelve 404', async () => {
+    const res = await request(app).delete('/api/transactions/tx_FANTASMA');
+    expect(res.status).toBe(404);
+  });
 });

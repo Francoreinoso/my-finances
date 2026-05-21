@@ -41,3 +41,21 @@ export const createTransactionSchema = z.discriminatedUnion('type', [
 ]);
 
 export type CreateTransactionRequest = z.infer<typeof createTransactionSchema>;
+
+/**
+ * Body de PATCH /api/transactions/:id. Solo monto, fecha, categoría y
+ * descripción son editables — el tipo y las cuentas no. Al menos un campo
+ * debe venir.
+ */
+export const updateTransactionSchema = z
+  .object({
+    amount: amountSchema.optional(),
+    date: isoDateSchema.optional(),
+    categoryId: z.string().min(1).nullable().optional(),
+    description: descriptionSchema,
+  })
+  .refine((obj) => Object.keys(obj).length > 0, {
+    message: 'Debe enviar al menos un campo a actualizar',
+  });
+
+export type UpdateTransactionRequest = z.infer<typeof updateTransactionSchema>;

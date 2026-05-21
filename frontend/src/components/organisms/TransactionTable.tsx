@@ -1,4 +1,4 @@
-import type { Transaction } from '@/types/transaction';
+import type { Transaction, TransactionChanges } from '@/types/transaction';
 import type { Account } from '@/types/account';
 import type { Category } from '@/types/category';
 import { TransactionRow } from '@/components/molecules/TransactionRow';
@@ -7,9 +7,17 @@ interface TransactionTableProps {
   transactions: Transaction[];
   accounts: Account[];
   categories: Category[];
+  onUpdate: (id: string, changes: TransactionChanges) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
-export function TransactionTable({ transactions, accounts, categories }: TransactionTableProps) {
+export function TransactionTable({
+  transactions,
+  accounts,
+  categories,
+  onUpdate,
+  onDelete,
+}: TransactionTableProps) {
   if (transactions.length === 0) {
     return (
       <div
@@ -35,6 +43,7 @@ export function TransactionTable({ transactions, accounts, categories }: Transac
             <th className="px-3 py-2 font-medium">Descripción</th>
             <th className="px-3 py-2 font-medium">Cuenta</th>
             <th className="px-3 py-2 text-right font-medium">Monto</th>
+            <th className="px-3 py-2" aria-label="Acciones" />
           </tr>
         </thead>
         <tbody>
@@ -48,6 +57,9 @@ export function TransactionTable({ transactions, accounts, categories }: Transac
                 category={category}
                 accountName={account?.name ?? '—'}
                 currency={account?.currency ?? 'CLP'}
+                categories={categories}
+                onUpdate={onUpdate}
+                onDelete={onDelete}
               />
             );
           })}

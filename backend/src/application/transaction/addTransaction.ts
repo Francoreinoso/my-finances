@@ -1,12 +1,9 @@
-import {
-  Transaction,
-  type CreateTransactionInput,
-  type TransactionType,
-} from '@/domain/transaction/Transaction.js';
+import { Transaction, type CreateTransactionInput } from '@/domain/transaction/Transaction.js';
 import { TransactionValidationError } from '@/domain/transaction/errors.js';
 import type { TransactionRepository } from '@/domain/transaction/TransactionRepository.js';
 import type { AccountRepository } from '@/domain/account/AccountRepository.js';
 import type { CategoryRepository } from '@/domain/category/CategoryRepository.js';
+import { assertCategoryMatches } from './assertCategoryMatches.js';
 
 async function assertAccountExists(
   repo: AccountRepository,
@@ -17,24 +14,6 @@ async function assertAccountExists(
   const account = await repo.findById(accountId);
   if (account === null) {
     throw new TransactionValidationError(`La cuenta de ${rol} "${accountId}" no existe`);
-  }
-}
-
-async function assertCategoryMatches(
-  repo: CategoryRepository,
-  categoryId: string | null,
-  transactionType: TransactionType,
-): Promise<void> {
-  if (categoryId === null) return;
-  const category = await repo.findById(categoryId);
-  if (category === null) {
-    throw new TransactionValidationError(`La categoría "${categoryId}" no existe`);
-  }
-  if (category.type !== transactionType) {
-    throw new TransactionValidationError(
-      `La categoría "${category.name}" es de tipo ${category.type}, ` +
-        `no corresponde a una transacción de tipo ${transactionType}`,
-    );
   }
 }
 

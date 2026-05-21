@@ -1,5 +1,8 @@
 import type { ErrorRequestHandler } from 'express';
-import { TransactionValidationError } from '@/domain/transaction/errors.js';
+import {
+  TransactionValidationError,
+  TransactionNotFoundError,
+} from '@/domain/transaction/errors.js';
 import {
   RecurringTransferNotFoundError,
   RecurringTransferNotPendingError,
@@ -19,6 +22,13 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   ) {
     res.status(400).json({
       error: { code: 'VALIDATION_ERROR', message: err.message },
+    });
+    return;
+  }
+
+  if (err instanceof TransactionNotFoundError) {
+    res.status(404).json({
+      error: { code: 'TRANSACTION_NOT_FOUND', message: err.message },
     });
     return;
   }

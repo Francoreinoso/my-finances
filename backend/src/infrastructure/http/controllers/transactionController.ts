@@ -2,11 +2,21 @@ import type { Request, Response } from 'express';
 import type { TransactionRepository } from '@/domain/transaction/TransactionRepository.js';
 import type { AccountRepository } from '@/domain/account/AccountRepository.js';
 import type { CategoryRepository } from '@/domain/category/CategoryRepository.js';
-import type { CreateTransactionInput } from '@/domain/transaction/Transaction.js';
+import type {
+  CreateTransactionInput,
+  TransactionChanges,
+} from '@/domain/transaction/Transaction.js';
 import { addTransaction } from '@/application/transaction/addTransaction.js';
 import { listRecentTransactions } from '@/application/transaction/listRecentTransactions.js';
-import type { CreateTransactionRequest } from '@/shared/validation/transactionSchemas.js';
+import { updateTransaction } from '@/application/transaction/updateTransaction.js';
+import { deleteTransaction } from '@/application/transaction/deleteTransaction.js';
+import type {
+  CreateTransactionRequest,
+  UpdateTransactionRequest,
+} from '@/shared/validation/transactionSchemas.js';
 import { QueryValidationError } from '@/infrastructure/http/errors.js';
+
+type IdParams = { id: string };
 
 /** Convierte el query param `limit` a número, o lanza si es basura. */
 function parseLimit(raw: unknown): number | undefined {
@@ -55,6 +65,16 @@ function toCreateInput(body: CreateTransactionRequest): CreateTransactionInput {
   return input;
 }
 
+/** Arma los cambios del dominio desde el body de PATCH (solo lo que vino). */
+function toChanges(body: UpdateTransactionRequest): TransactionChanges {
+  const changes: TransactionChanges = {};
+  if (body.amount !== undefined) changes.amount = body.amount;
+  if (body.date !== undefined) changes.date = body.date;
+  if (body.categoryId !== undefined) changes.categoryId = body.categoryId;
+  if (body.description !== undefined) changes.description = body.description;
+  return changes;
+}
+
 export function makeTransactionController(
   transactions: TransactionRepository,
   accounts: AccountRepository,
@@ -76,6 +96,22 @@ export function makeTransactionController(
         toCreateInput(body),
       );
       res.status(201).json(transaction.toJSON());
+    },
+
+    update: async (req: Request<IdParams>, res: Response): Promise<void> => {
+      const body = req.body as UpdateTransactionRequest;
+      const updated = await updateTransaction(
+        transactions,
+        categories,
+        req.params.id,
+        toChanges(body),
+      );
+      res.json(updated.toJSON());
+    },
+
+    remove: async (req: Request<IdParams>, res: Response): Promise<void> => {
+      await deleteTransaction(transactions, req.params.id);
+      res.status(204).send();
     },
   };
 }

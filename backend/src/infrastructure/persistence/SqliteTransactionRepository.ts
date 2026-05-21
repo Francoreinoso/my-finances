@@ -1,4 +1,4 @@
-import { desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { Transaction } from '@/domain/transaction/Transaction.js';
 import type { TransactionRepository } from '@/domain/transaction/TransactionRepository.js';
 import { transactions, type TransactionRow } from './schema.js';
@@ -53,5 +53,36 @@ export class SqliteTransactionRepository implements TransactionRepository {
       .limit(limit)
       .all();
     return Promise.resolve(rows.map(toTransaction));
+  }
+
+  findById(id: string): Promise<Transaction | null> {
+    const row = this.db.select().from(transactions).where(eq(transactions.id, id)).get();
+    return Promise.resolve(row ? toTransaction(row) : null);
+  }
+
+  /** Actualiza una transacción existente. No toca createdAt. */
+  update(transaction: Transaction): Promise<void> {
+    const snap = transaction.toJSON();
+    this.db
+      .update(transactions)
+      .set({
+        date: snap.date,
+        amount: snap.amount,
+        type: snap.type,
+        fromAccountId: snap.fromAccountId,
+        toAccountId: snap.toAccountId,
+        categoryId: snap.categoryId,
+        bucketId: snap.bucketId,
+        description: snap.description,
+        recurringId: snap.recurringId,
+      })
+      .where(eq(transactions.id, snap.id))
+      .run();
+    return Promise.resolve();
+  }
+
+  delete(id: string): Promise<void> {
+    this.db.delete(transactions).where(eq(transactions.id, id)).run();
+    return Promise.resolve();
   }
 }

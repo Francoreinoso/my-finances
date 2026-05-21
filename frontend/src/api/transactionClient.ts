@@ -1,4 +1,8 @@
-import type { Transaction, CreateTransactionInput } from '@/types/transaction';
+import type {
+  Transaction,
+  CreateTransactionInput,
+  TransactionChanges,
+} from '@/types/transaction';
 import { request } from '@/api/http';
 
 export const transactionClient = {
@@ -11,6 +15,15 @@ export const transactionClient = {
       method: 'POST',
       body: JSON.stringify(input),
     });
+  },
+  update(id: string, changes: TransactionChanges): Promise<void> {
+    return request<void>(`/transactions/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(changes),
+    });
+  },
+  remove(id: string): Promise<void> {
+    return request<void>(`/transactions/${id}`, { method: 'DELETE' });
   },
 };
 

@@ -6,7 +6,16 @@ import { TransactionTable } from '@/components/organisms/TransactionTable';
 import { NewTransactionModal } from '@/components/molecules/NewTransactionModal';
 
 export function TransaccionesPage() {
-  const { accounts, categories, transactions, status, error, createTransaction } = useFinances();
+  const {
+    accounts,
+    categories,
+    transactions,
+    status,
+    error,
+    createTransaction,
+    updateTransaction,
+    deleteTransaction,
+  } = useFinances();
   const [modalOpen, setModalOpen] = useState(false);
 
   // Hotkey "N" para abrir el modal, salvo que se esté escribiendo en un campo.
@@ -55,6 +64,8 @@ export function TransaccionesPage() {
             transactions={transactions}
             accounts={accounts}
             categories={categories}
+            onUpdate={updateTransaction}
+            onDelete={deleteTransaction}
           />
         </div>
       )}

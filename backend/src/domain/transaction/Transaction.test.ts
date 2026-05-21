@@ -148,3 +148,59 @@ describe('Transaction.fromPersistence', () => {
     expect(Transaction.fromPersistence(snapshot).toJSON()).toEqual(snapshot);
   });
 });
+
+describe('Transaction.withChanges', () => {
+  const base = Transaction.create({
+    date: '2026-05-10',
+    amount: 5500,
+    type: 'expense',
+    fromAccountId: 'acc_1',
+    categoryId: 'cat_x',
+    description: 'Almuerzo',
+  });
+
+  it('cambia monto, fecha, categoría y descripción', () => {
+    const edited = base.withChanges({
+      amount: 5000,
+      date: '2026-05-11',
+      categoryId: 'cat_y',
+      description: 'Cena',
+    });
+    expect(edited.amount).toBe(5000);
+    expect(edited.date).toBe('2026-05-11');
+    expect(edited.categoryId).toBe('cat_y');
+    expect(edited.description).toBe('Cena');
+  });
+
+  it('conserva id, tipo, cuentas y createdAt', () => {
+    const edited = base.withChanges({ amount: 5000 });
+    expect(edited.id).toBe(base.id);
+    expect(edited.type).toBe(base.type);
+    expect(edited.fromAccountId).toBe(base.fromAccountId);
+    expect(edited.createdAt).toBe(base.createdAt);
+  });
+
+  it('rechaza un monto inválido', () => {
+    expect(() => base.withChanges({ amount: 0 })).toThrow(TransactionValidationError);
+  });
+
+  it('rechaza una fecha inválida', () => {
+    expect(() => base.withChanges({ date: '2026-02-30' })).toThrow(TransactionValidationError);
+  });
+
+  it('no muta la transacción original', () => {
+    base.withChanges({ amount: 9999 });
+    expect(base.amount).toBe(5500);
+  });
+
+  it('una transferencia nunca toma categoría', () => {
+    const transfer = Transaction.create({
+      date: '2026-05-10',
+      amount: 1000,
+      type: 'transfer',
+      fromAccountId: 'acc_1',
+      toAccountId: 'acc_2',
+    });
+    expect(transfer.withChanges({ categoryId: 'cat_x' }).categoryId).toBeNull();
+  });
+});

@@ -4,7 +4,11 @@ import { categoryClient } from '@/api/categoryClient';
 import { transactionClient } from '@/api/transactionClient';
 import type { Account } from '@/types/account';
 import type { Category } from '@/types/category';
-import type { Transaction, CreateTransactionInput } from '@/types/transaction';
+import type {
+  Transaction,
+  CreateTransactionInput,
+  TransactionChanges,
+} from '@/types/transaction';
 
 export type FinancesStatus = 'loading' | 'ready' | 'error';
 
@@ -15,6 +19,8 @@ export interface UseFinances {
   status: FinancesStatus;
   error: string | null;
   createTransaction: (input: CreateTransactionInput) => Promise<void>;
+  updateTransaction: (id: string, changes: TransactionChanges) => Promise<void>;
+  deleteTransaction: (id: string) => Promise<void>;
 }
 
 function toMessage(e: unknown): string {
@@ -22,10 +28,8 @@ function toMessage(e: unknown): string {
 }
 
 /**
- * Carga cuentas, categorías y transacciones, y expone la acción de crear.
- * Estado local con useState: en Fase 1 hay una sola vista que consume esto.
- * Cuando la Fase 2 sume vistas que compartan estos datos, conviene migrar a
- * un store (Zustand) — la interfaz del hook puede quedar igual.
+ * Carga cuentas, categorías y transacciones, y expone las acciones de crear,
+ * editar y borrar. Estado local con useState: lo consume una sola vista.
  */
 export function useFinances(): UseFinances {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -57,14 +61,46 @@ export function useFinances(): UseFinances {
     void loadAll();
   }, [loadAll]);
 
-  const createTransaction = useCallback(async (input: CreateTransactionInput) => {
-    // El error se propaga a propósito: el modal lo muestra y se queda abierto.
-    await transactionClient.create(input);
-    // La transacción cambió balances: recargamos cuentas y transacciones.
+  // Toda mutación de transacciones cambia balances: recargamos cuentas y
+  // transacciones. El error se propaga a propósito: el modal lo muestra.
+  const reloadCashState = useCallback(async () => {
     const [a, t] = await Promise.all([accountClient.list(), transactionClient.list()]);
     setAccounts(a);
     setTransactions(t);
   }, []);
 
-  return { accounts, categories, transactions, status, error, createTransaction };
+  const createTransaction = useCallback(
+    async (input: CreateTransactionInput) => {
+      await transactionClient.create(input);
+      await reloadCashState();
+    },
+    [reloadCashState],
+  );
+
+  const updateTransaction = useCallback(
+    async (id: string, changes: TransactionChanges) => {
+      await transactionClient.update(id, changes);
+      await reloadCashState();
+    },
+    [reloadCashState],
+  );
+
+  const deleteTransaction = useCallback(
+    async (id: string) => {
+      await transactionClient.remove(id);
+      await reloadCashState();
+    },
+    [reloadCashState],
+  );
+
+  return {
+    accounts,
+    categories,
+    transactions,
+    status,
+    error,
+    createTransaction,
+    updateTransaction,
+    deleteTransaction,
+  };
 }

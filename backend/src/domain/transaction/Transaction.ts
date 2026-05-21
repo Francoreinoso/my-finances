@@ -28,6 +28,14 @@ export interface TransactionSnapshot {
   createdAt: string;
 }
 
+/** Campos editables de una transacción. El tipo y las cuentas NO se editan. */
+export interface TransactionChanges {
+  amount?: number;
+  date?: string;
+  categoryId?: string | null;
+  description?: string | null;
+}
+
 const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_DESCRIPTION_LENGTH = 280;
 
@@ -114,8 +122,8 @@ function resolveAccounts(
 }
 
 /**
- * Una transacción es inmutable: se crea válida o no se crea. En Fase 1 no hay
- * edición, así que no existe `withChanges`. El monto se guarda siempre positivo;
+ * Una transacción se crea válida o no se crea, y es inmutable: `withChanges`
+ * devuelve una nueva, nunca modifica. El monto se guarda siempre positivo;
  * el signo lo determina el tipo más las cuentas origen/destino.
  */
 export class Transaction {
@@ -174,6 +182,28 @@ export class Transaction {
 
   static fromPersistence(snapshot: TransactionSnapshot): Transaction {
     return new Transaction(snapshot);
+  }
+
+  /**
+   * Devuelve una transacción editada (inmutable). Solo cambian monto, fecha,
+   * categoría y descripción — el tipo, las cuentas, el id y la fecha de
+   * creación se conservan. Re-valida monto y fecha.
+   */
+  withChanges(changes: TransactionChanges): Transaction {
+    const amount = changes.amount === undefined ? this.amount : normalizeAmount(changes.amount);
+    const date = changes.date === undefined ? this.date : normalizeDate(changes.date);
+    const description =
+      changes.description === undefined
+        ? this.description
+        : normalizeDescription(changes.description);
+    const categoryId =
+      this.type === 'transfer'
+        ? null
+        : changes.categoryId === undefined
+          ? this.categoryId
+          : (changes.categoryId ?? null);
+
+    return new Transaction({ ...this.toJSON(), amount, date, categoryId, description });
   }
 
   toJSON(): TransactionSnapshot {
