@@ -24,6 +24,7 @@ describe('API HTTP', () => {
       bucketRepository: new SqliteBucketRepository(db),
       recurringRepository: new SqliteRecurringTransferRepository(db),
       reportRepository: new SqliteReportRepository(db),
+      dbPath: ':memory:',
       corsOrigin: '*',
     });
   });
@@ -250,5 +251,18 @@ describe('API HTTP', () => {
       .post('/api/categories')
       .send({ name: 'X', type: 'expense', color: 'rojo' });
     expect(res.status).toBe(400);
+  });
+
+  it('GET /api/transactions/export devuelve un CSV', async () => {
+    await request(app).post('/api/transactions').send({
+      type: 'expense',
+      date: '2026-05-10',
+      amount: 5500,
+      accountId: 'acc_santander',
+    });
+    const res = await request(app).get('/api/transactions/export');
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toContain('text/csv');
+    expect(res.text).toContain('Fecha,Tipo,Monto');
   });
 });

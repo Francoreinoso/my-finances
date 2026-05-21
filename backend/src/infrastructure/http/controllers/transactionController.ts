@@ -10,6 +10,7 @@ import { addTransaction } from '@/application/transaction/addTransaction.js';
 import { listRecentTransactions } from '@/application/transaction/listRecentTransactions.js';
 import { updateTransaction } from '@/application/transaction/updateTransaction.js';
 import { deleteTransaction } from '@/application/transaction/deleteTransaction.js';
+import { exportTransactionsCsv } from '@/application/transaction/exportTransactionsCsv.js';
 import type {
   CreateTransactionRequest,
   UpdateTransactionRequest,
@@ -112,6 +113,13 @@ export function makeTransactionController(
     remove: async (req: Request<IdParams>, res: Response): Promise<void> => {
       await deleteTransaction(transactions, req.params.id);
       res.status(204).send();
+    },
+
+    exportCsv: async (_req: Request, res: Response): Promise<void> => {
+      const csv = await exportTransactionsCsv(transactions, accounts, categories);
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="transacciones.csv"');
+      res.send(csv);
     },
   };
 }

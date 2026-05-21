@@ -55,6 +55,16 @@ export class SqliteTransactionRepository implements TransactionRepository {
     return Promise.resolve(rows.map(toTransaction));
   }
 
+  /** Todas las transacciones, más recientes primero. Para el export CSV. */
+  findAll(): Promise<Transaction[]> {
+    const rows = this.db
+      .select()
+      .from(transactions)
+      .orderBy(desc(transactions.date), desc(transactions.createdAt))
+      .all();
+    return Promise.resolve(rows.map(toTransaction));
+  }
+
   findById(id: string): Promise<Transaction | null> {
     const row = this.db.select().from(transactions).where(eq(transactions.id, id)).get();
     return Promise.resolve(row ? toTransaction(row) : null);

@@ -6,6 +6,7 @@ import type { TransactionRepository } from '@/domain/transaction/TransactionRepo
 import type { BucketRepository } from '@/domain/bucket/BucketRepository.js';
 import type { RecurringTransferRepository } from '@/domain/recurring/RecurringTransferRepository.js';
 import type { ReportRepository } from '@/domain/report/ReportRepository.js';
+import { backupDatabase } from '@/infrastructure/backup/backupDatabase.js';
 import { makeAccountController } from './controllers/accountController.js';
 import { makeAccountRouter } from './routes/accountRoutes.js';
 import { makeCategoryController } from './controllers/categoryController.js';
@@ -27,6 +28,7 @@ export interface ServerDeps {
   bucketRepository: BucketRepository;
   recurringRepository: RecurringTransferRepository;
   reportRepository: ReportRepository;
+  dbPath: string;
   corsOrigin: string | string[];
 }
 
@@ -42,6 +44,11 @@ export function createApp(deps: ServerDeps): Express {
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
+  });
+
+  // Respaldo: copia el archivo .db. Endpoint utilitario, sin recurso propio.
+  app.post('/api/backup', (_req, res) => {
+    res.status(201).json(backupDatabase(deps.dbPath));
   });
 
   const accountController = makeAccountController(deps.accountRepository);

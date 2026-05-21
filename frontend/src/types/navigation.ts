@@ -1,4 +1,12 @@
-import { Receipt, PiggyBank, Repeat, ChartPie, Tag, type Icon } from '@phosphor-icons/react';
+import {
+  Receipt,
+  PiggyBank,
+  Repeat,
+  ChartPie,
+  Tag,
+  Database,
+  type Icon,
+} from '@phosphor-icons/react';
 
 export interface NavItem {
   id: string;
@@ -15,4 +23,5 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'recurrentes', label: 'Recurrentes', icon: Repeat, path: '/recurrentes', enabled: true },
   { id: 'resumen', label: 'Resumen', icon: ChartPie, path: '/resumen', enabled: true },
   { id: 'categorias', label: 'Categorías', icon: Tag, path: '/categorias', enabled: true },
+  { id: 'datos', label: 'Datos', icon: Database, path: '/datos', enabled: true },
 ] as const;

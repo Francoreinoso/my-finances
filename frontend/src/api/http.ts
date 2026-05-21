@@ -1,4 +1,4 @@
-const API_BASE_URL =
+export const API_BASE_URL =
   (import.meta.env['VITE_API_URL'] as string | undefined) ?? 'http://localhost:4001/api';
 
 /** Error de una respuesta HTTP no-OK. Lleva el status para que la UI decida. */

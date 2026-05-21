@@ -5,6 +5,7 @@ import { BucketsPage } from '@/pages/BucketsPage';
 import { RecurrentesPage } from '@/pages/RecurrentesPage';
 import { ResumenPage } from '@/pages/ResumenPage';
 import { CategoriasPage } from '@/pages/CategoriasPage';
+import { DatosPage } from '@/pages/DatosPage';
 
 export function App() {
   return (
@@ -16,6 +17,7 @@ export function App() {
           <Route path="/recurrentes" element={<RecurrentesPage />} />
           <Route path="/resumen" element={<ResumenPage />} />
           <Route path="/categorias" element={<CategoriasPage />} />
+          <Route path="/datos" element={<DatosPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AppLayout>

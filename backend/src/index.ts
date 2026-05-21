@@ -24,6 +24,7 @@ const app = createApp({
   bucketRepository: new SqliteBucketRepository(db),
   recurringRepository: new SqliteRecurringTransferRepository(db),
   reportRepository: new SqliteReportRepository(db),
+  dbPath: DB_PATH,
   corsOrigin: FRONTEND_ORIGIN,
 });
 
