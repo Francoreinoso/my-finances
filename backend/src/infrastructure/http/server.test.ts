@@ -177,4 +177,20 @@ describe('API HTTP', () => {
     const res = await request(app).get('/api/reports/monthly?month=mayo');
     expect(res.status).toBe(400);
   });
+
+  it('PATCH /api/recurring/:id cambia el monto del aporte', async () => {
+    const res = await request(app).patch('/api/recurring/rec_mudanza').send({ amount: 120000 });
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ amount: 120000 });
+  });
+
+  it('PATCH /api/recurring/:id con body vacío devuelve 400', async () => {
+    const res = await request(app).patch('/api/recurring/rec_mudanza').send({});
+    expect(res.status).toBe(400);
+  });
+
+  it('PATCH /api/recurring/:id de un aporte inexistente devuelve 404', async () => {
+    const res = await request(app).patch('/api/recurring/rec_FANTASMA').send({ amount: 1 });
+    expect(res.status).toBe(404);
+  });
 });

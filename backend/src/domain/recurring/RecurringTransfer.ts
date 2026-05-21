@@ -1,3 +1,5 @@
+import { RecurringTransferValidationError } from './errors.js';
+
 export interface RecurringTransferSnapshot {
   id: string;
   name: string;
@@ -16,6 +18,12 @@ export interface RecurringTransferSnapshot {
  */
 export interface RecurringTransferView extends RecurringTransferSnapshot {
   pending: boolean;
+}
+
+/** Campos editables de un aporte recurrente. */
+export interface RecurringTransferChanges {
+  amount?: number;
+  isActive?: boolean;
 }
 
 const pad = (n: number): string => String(n).padStart(2, '0');
@@ -82,6 +90,22 @@ export class RecurringTransfer {
     return new RecurringTransfer({
       ...this.toJSON(),
       nextDueDate: nextMonthDate(this.nextDueDate, this.dayOfMonth),
+    });
+  }
+
+  /**
+   * Aplica cambios y devuelve un aporte nuevo (inmutable). Valida el monto:
+   * un aporte de cero o negativo no tiene sentido.
+   */
+  withChanges(changes: RecurringTransferChanges): RecurringTransfer {
+    const amount = changes.amount ?? this.amount;
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new RecurringTransferValidationError('El monto del aporte debe ser mayor a cero');
+    }
+    return new RecurringTransfer({
+      ...this.toJSON(),
+      amount,
+      isActive: changes.isActive ?? this.isActive,
     });
   }
 

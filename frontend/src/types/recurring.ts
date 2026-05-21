@@ -14,3 +14,9 @@ export interface RecurringTransfer {
   isActive: boolean;
   pending: boolean;
 }
+
+/** Campos editables de un aporte recurrente (body de PATCH). */
+export interface RecurringTransferChanges {
+  amount?: number;
+  isActive?: boolean;
+}

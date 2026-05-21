@@ -12,3 +12,11 @@ export class RecurringTransferNotPendingError extends Error {
     this.name = 'RecurringTransferNotPendingError';
   }
 }
+
+/** Un cambio a un aporte recurrente es inválido (ej: monto <= 0). */
+export class RecurringTransferValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'RecurringTransferValidationError';
+  }
+}

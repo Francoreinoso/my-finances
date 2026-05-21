@@ -2,7 +2,7 @@ import { useRecurring } from '@/hooks/useRecurring';
 import { RecurringTransferCard } from '@/components/molecules/RecurringTransferCard';
 
 export function RecurrentesPage() {
-  const { recurring, status, error, confirm } = useRecurring();
+  const { recurring, status, error, confirm, update } = useRecurring();
   const pendingCount = recurring.filter((r) => r.pending).length;
 
   // Los pendientes primero: lo que requiere acción flota arriba.
@@ -37,7 +37,12 @@ export function RecurrentesPage() {
             </p>
           )}
           {sorted.map((r) => (
-            <RecurringTransferCard key={r.id} recurring={r} onConfirm={confirm} />
+            <RecurringTransferCard
+              key={r.id}
+              recurring={r}
+              onConfirm={confirm}
+              onUpdate={update}
+            />
           ))}
         </div>
       )}

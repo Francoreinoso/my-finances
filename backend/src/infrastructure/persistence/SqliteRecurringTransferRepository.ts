@@ -36,6 +36,25 @@ export class SqliteRecurringTransferRepository implements RecurringTransferRepos
     return Promise.resolve(row ? toRecurringTransfer(row) : null);
   }
 
+  save(recurring: RecurringTransfer): Promise<void> {
+    const rt = recurring.toJSON();
+    this.db
+      .update(recurringTransfers)
+      .set({
+        name: rt.name,
+        fromAccountId: rt.fromAccountId,
+        toAccountId: rt.toAccountId,
+        amount: rt.amount,
+        bucketId: rt.bucketId,
+        dayOfMonth: rt.dayOfMonth,
+        nextDueDate: rt.nextDueDate,
+        isActive: rt.isActive,
+      })
+      .where(eq(recurringTransfers.id, rt.id))
+      .run();
+    return Promise.resolve();
+  }
+
   confirm(
     generatedTransaction: Transaction,
     advancedRecurring: RecurringTransfer,

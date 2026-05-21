@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { RecurringTransfer, type RecurringTransferSnapshot } from './RecurringTransfer.js';
+import { RecurringTransferValidationError } from './errors.js';
 
 function make(overrides: Partial<RecurringTransferSnapshot> = {}): RecurringTransfer {
   return RecurringTransfer.fromPersistence({
@@ -59,5 +60,31 @@ describe('RecurringTransfer.advanced', () => {
     const rt = make({ nextDueDate: '2026-06-08' });
     rt.advanced();
     expect(rt.nextDueDate).toBe('2026-06-08');
+  });
+});
+
+describe('RecurringTransfer.withChanges', () => {
+  it('cambia el monto', () => {
+    expect(make({ amount: 80000 }).withChanges({ amount: 120000 }).amount).toBe(120000);
+  });
+
+  it('activa o pausa el aporte', () => {
+    expect(make({ isActive: true }).withChanges({ isActive: false }).isActive).toBe(false);
+  });
+
+  it('deja intacto lo que no se cambia', () => {
+    const updated = make({ amount: 80000, isActive: true }).withChanges({ amount: 120000 });
+    expect(updated.isActive).toBe(true);
+  });
+
+  it('rechaza un monto cero o negativo', () => {
+    expect(() => make().withChanges({ amount: 0 })).toThrow(RecurringTransferValidationError);
+    expect(() => make().withChanges({ amount: -5 })).toThrow(RecurringTransferValidationError);
+  });
+
+  it('no muta el aporte original', () => {
+    const rt = make({ amount: 80000 });
+    rt.withChanges({ amount: 120000 });
+    expect(rt.amount).toBe(80000);
   });
 });

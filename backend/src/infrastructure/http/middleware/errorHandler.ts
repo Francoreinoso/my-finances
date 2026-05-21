@@ -3,6 +3,7 @@ import { TransactionValidationError } from '@/domain/transaction/errors.js';
 import {
   RecurringTransferNotFoundError,
   RecurringTransferNotPendingError,
+  RecurringTransferValidationError,
 } from '@/domain/recurring/errors.js';
 import { QueryValidationError } from '@/infrastructure/http/errors.js';
 
@@ -11,7 +12,11 @@ import { QueryValidationError } from '@/infrastructure/http/errors.js';
  * Cualquier error desconocido → 500 con mensaje genérico (no expone internals).
  */
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-  if (err instanceof TransactionValidationError || err instanceof QueryValidationError) {
+  if (
+    err instanceof TransactionValidationError ||
+    err instanceof QueryValidationError ||
+    err instanceof RecurringTransferValidationError
+  ) {
     res.status(400).json({
       error: { code: 'VALIDATION_ERROR', message: err.message },
     });

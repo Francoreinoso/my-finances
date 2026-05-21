@@ -1,16 +1,23 @@
 import { useState } from 'react';
 import { Button } from '@/components/atoms/Button';
-import type { RecurringTransfer } from '@/types/recurring';
+import { EditRecurringModal } from '@/components/molecules/EditRecurringModal';
+import type { RecurringTransfer, RecurringTransferChanges } from '@/types/recurring';
 import { formatMoney } from '@/lib/format';
 
 interface RecurringTransferCardProps {
   recurring: RecurringTransfer;
   onConfirm: (id: string) => Promise<void>;
+  onUpdate: (id: string, changes: RecurringTransferChanges) => Promise<void>;
 }
 
-export function RecurringTransferCard({ recurring, onConfirm }: RecurringTransferCardProps) {
+export function RecurringTransferCard({
+  recurring,
+  onConfirm,
+  onUpdate,
+}: RecurringTransferCardProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
 
   const handleConfirm = async () => {
     setSubmitting(true);
@@ -42,18 +49,28 @@ export function RecurringTransferCard({ recurring, onConfirm }: RecurringTransfe
         Cada día {recurring.dayOfMonth} · próximo: {recurring.nextDueDate}
       </p>
 
-      {recurring.pending ? (
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <Button onClick={() => void handleConfirm()} disabled={submitting}>
-            {submitting ? 'Confirmando…' : 'Confirmar aporte'}
-          </Button>
-          <span className="text-xs text-text-muted">Pendiente — ¿ya hiciste la transferencia?</span>
-        </div>
+      {!recurring.isActive ? (
+        <p className="mt-3 text-xs text-warning">Pausado — no genera avisos.</p>
+      ) : recurring.pending ? (
+        <p className="mt-3 text-xs text-text-muted">
+          Pendiente — confirmá cuando hayas hecho la transferencia.
+        </p>
       ) : (
         <p className="mt-3 text-xs text-text-subtle">
           Al día. El próximo aviso es el {recurring.nextDueDate}.
         </p>
       )}
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {recurring.pending && (
+          <Button onClick={() => void handleConfirm()} disabled={submitting}>
+            {submitting ? 'Confirmando…' : 'Confirmar aporte'}
+          </Button>
+        )}
+        <Button variant="ghost" type="button" onClick={() => setEditing(true)}>
+          Editar
+        </Button>
+      </div>
 
       {error && (
         <p
@@ -62,6 +79,14 @@ export function RecurringTransferCard({ recurring, onConfirm }: RecurringTransfe
         >
           {error}
         </p>
+      )}
+
+      {editing && (
+        <EditRecurringModal
+          recurring={recurring}
+          onClose={() => setEditing(false)}
+          onSubmit={(changes) => onUpdate(recurring.id, changes)}
+        />
       )}
     </div>
   );
