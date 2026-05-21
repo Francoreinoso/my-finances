@@ -1,0 +1,58 @@
+/*
+ * Variables del tema oscuro/anime de my-finanzas.
+ *
+ * Paleta derivada de la imagen de fondo (public/bg-anime-eye.png):
+ * - Fondo: casi negro, frío y monocromático, como el entorno de la imagen.
+ * - Acento: violeta iris, el tono dominante del ojo prismático.
+ * - Acento secundario: cian, el brillo azul-verdoso del mismo ojo.
+ * - Gradiente prisma: el arcoíris del iris, para detalles y estados activos.
+ *
+ * Cambiar estas variables es lo único necesario para reskinear toda la app.
+ */
+:root {
+  --bg-primary: #0b0a10;
+  --bg-surface: #14121d;
+  --bg-elevated: #1d1a2a;
+  --accent: #8b5cff;
+  --accent-soft: #c2b1ff;
+  --accent-muted: #342a5c;
+  --accent-cyan: #45d6e6;
+  --text-primary: #f5f4fb;
+  --text-muted: #a4a2ba;
+  --text-subtle: #6b6982;
+  --border: #262236;
+  --border-strong: #393152;
+  --success: #5fd0a8;
+  --warning: #ffc24b;
+  --danger: #ff5d7a;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --gradient-prism: linear-gradient(125deg, #8b5cff 0%, #d65cff 45%, #45d6e6 100%);
+
+  --font-sans:
+    'Sora', 'Noto Sans JP', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+
+/*
+ * Exponemos las variables CSS como utilities de Tailwind v4 vía @theme.
+ * Ej: bg-bg-primary, text-accent, border-border-default.
+ */
+@theme {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-muted: var(--accent-muted);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-text-primary: var(--text-primary);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-border-default: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}

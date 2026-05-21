@@ -1,0 +1,20 @@
+import { Receipt, PiggyBank, Repeat, ChartPie, type Icon } from '@phosphor-icons/react';
+
+export interface NavItem {
+  id: string;
+  label: string;
+  icon: Icon;
+  path: string;
+  enabled: boolean;
+}
+
+/**
+ * Vistas de my-finanzas. En Fase 1 solo "Transacciones" está habilitada;
+ * las demás se muestran como "(pronto)" hasta que lleguen sus fases.
+ */
+export const NAV_ITEMS: readonly NavItem[] = [
+  { id: 'transacciones', label: 'Transacciones', icon: Receipt, path: '/', enabled: true },
+  { id: 'buckets', label: 'Buckets', icon: PiggyBank, path: '/buckets', enabled: false },
+  { id: 'recurrentes', label: 'Recurrentes', icon: Repeat, path: '/recurrentes', enabled: false },
+  { id: 'resumen', label: 'Resumen', icon: ChartPie, path: '/resumen', enabled: false },
+] as const;
