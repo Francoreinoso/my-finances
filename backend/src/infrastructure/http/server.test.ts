@@ -8,6 +8,7 @@ import { SqliteCategoryRepository } from '@/infrastructure/persistence/SqliteCat
 import { SqliteTransactionRepository } from '@/infrastructure/persistence/SqliteTransactionRepository.js';
 import { SqliteBucketRepository } from '@/infrastructure/persistence/SqliteBucketRepository.js';
 import { SqliteRecurringTransferRepository } from '@/infrastructure/persistence/SqliteRecurringTransferRepository.js';
+import { SqliteReportRepository } from '@/infrastructure/persistence/SqliteReportRepository.js';
 import { createApp } from './server.js';
 
 describe('API HTTP', () => {
@@ -22,6 +23,7 @@ describe('API HTTP', () => {
       transactionRepository: new SqliteTransactionRepository(db),
       bucketRepository: new SqliteBucketRepository(db),
       recurringRepository: new SqliteRecurringTransferRepository(db),
+      reportRepository: new SqliteReportRepository(db),
       corsOrigin: '*',
     });
   });
@@ -150,5 +152,29 @@ describe('API HTTP', () => {
   it('POST /api/recurring/:id/confirm de un aporte inexistente devuelve 404', async () => {
     const res = await request(app).post('/api/recurring/rec_FANTASMA/confirm');
     expect(res.status).toBe(404);
+  });
+
+  it('GET /api/reports/monthly devuelve el resumen del mes', async () => {
+    await request(app).post('/api/transactions').send({
+      type: 'income',
+      date: '2026-05-08',
+      amount: 250000,
+      accountId: 'acc_santander',
+    });
+    await request(app).post('/api/transactions').send({
+      type: 'expense',
+      date: '2026-05-10',
+      amount: 50000,
+      accountId: 'acc_santander',
+      categoryId: 'cat_comida',
+    });
+    const res = await request(app).get('/api/reports/monthly?month=2026-05');
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ income: 250000, expense: 50000, net: 200000 });
+  });
+
+  it('GET /api/reports/monthly con month mal formado devuelve 400', async () => {
+    const res = await request(app).get('/api/reports/monthly?month=mayo');
+    expect(res.status).toBe(400);
   });
 });

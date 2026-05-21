@@ -5,6 +5,7 @@ import type { CategoryRepository } from '@/domain/category/CategoryRepository.js
 import type { TransactionRepository } from '@/domain/transaction/TransactionRepository.js';
 import type { BucketRepository } from '@/domain/bucket/BucketRepository.js';
 import type { RecurringTransferRepository } from '@/domain/recurring/RecurringTransferRepository.js';
+import type { ReportRepository } from '@/domain/report/ReportRepository.js';
 import { makeAccountController } from './controllers/accountController.js';
 import { makeAccountRouter } from './routes/accountRoutes.js';
 import { makeCategoryController } from './controllers/categoryController.js';
@@ -15,6 +16,8 @@ import { makeBucketController } from './controllers/bucketController.js';
 import { makeBucketRouter } from './routes/bucketRoutes.js';
 import { makeRecurringController } from './controllers/recurringController.js';
 import { makeRecurringRouter } from './routes/recurringRoutes.js';
+import { makeReportController } from './controllers/reportController.js';
+import { makeReportRouter } from './routes/reportRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 export interface ServerDeps {
@@ -23,6 +26,7 @@ export interface ServerDeps {
   transactionRepository: TransactionRepository;
   bucketRepository: BucketRepository;
   recurringRepository: RecurringTransferRepository;
+  reportRepository: ReportRepository;
   corsOrigin: string | string[];
 }
 
@@ -58,6 +62,9 @@ export function createApp(deps: ServerDeps): Express {
 
   const recurringController = makeRecurringController(deps.recurringRepository);
   app.use('/api/recurring', makeRecurringRouter(recurringController));
+
+  const reportController = makeReportController(deps.reportRepository, deps.categoryRepository);
+  app.use('/api/reports', makeReportRouter(reportController));
 
   app.use(errorHandler);
 

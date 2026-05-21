@@ -6,6 +6,7 @@ import { SqliteCategoryRepository } from '@/infrastructure/persistence/SqliteCat
 import { SqliteTransactionRepository } from '@/infrastructure/persistence/SqliteTransactionRepository.js';
 import { SqliteBucketRepository } from '@/infrastructure/persistence/SqliteBucketRepository.js';
 import { SqliteRecurringTransferRepository } from '@/infrastructure/persistence/SqliteRecurringTransferRepository.js';
+import { SqliteReportRepository } from '@/infrastructure/persistence/SqliteReportRepository.js';
 import { createApp } from '@/infrastructure/http/server.js';
 
 const PORT = Number(process.env['PORT'] ?? 4001);
@@ -22,6 +23,7 @@ const app = createApp({
   transactionRepository: new SqliteTransactionRepository(db),
   bucketRepository: new SqliteBucketRepository(db),
   recurringRepository: new SqliteRecurringTransferRepository(db),
+  reportRepository: new SqliteReportRepository(db),
   corsOrigin: FRONTEND_ORIGIN,
 });
 
