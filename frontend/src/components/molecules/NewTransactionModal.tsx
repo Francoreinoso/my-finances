@@ -1,6 +1,8 @@
 import { useId, useState, type FormEvent } from 'react';
 import { Button } from '@/components/atoms/Button';
 import { Modal } from '@/components/molecules/Modal';
+import { DatePicker } from '@/components/molecules/DatePicker';
+import { MoneyInput } from '@/components/molecules/MoneyInput';
 import { FIELD_CLASS } from '@/lib/formClasses';
 import type { Account } from '@/types/account';
 import type { Category } from '@/types/category';
@@ -124,19 +126,14 @@ export function NewTransactionModal({
 
         <label className="flex flex-col gap-1 text-sm text-text-muted">
           Monto
-          <input
-            type="number"
-            inputMode="decimal"
-            min="1"
-            step="any"
+          <MoneyInput
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={setAmount}
             onBlur={() => setAmountTouched(true)}
             aria-invalid={showAmountError}
             aria-describedby={showAmountError ? amountErrorId : undefined}
             placeholder="0"
             autoFocus
-            className={FIELD_CLASS}
           />
         </label>
         {showAmountError && (
@@ -215,12 +212,7 @@ export function NewTransactionModal({
 
         <label className="flex flex-col gap-1 text-sm text-text-muted">
           Fecha
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className={FIELD_CLASS}
-          />
+          <DatePicker value={date} onChange={setDate} />
         </label>
 
         <label className="flex flex-col gap-1 text-sm text-text-muted">

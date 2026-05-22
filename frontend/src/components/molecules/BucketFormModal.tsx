@@ -1,6 +1,8 @@
 import { useId, useState, type FormEvent } from 'react';
 import { Button } from '@/components/atoms/Button';
 import { Modal } from '@/components/molecules/Modal';
+import { DatePicker } from '@/components/molecules/DatePicker';
+import { MoneyInput } from '@/components/molecules/MoneyInput';
 import { FIELD_CLASS } from '@/lib/formClasses';
 import type { Account } from '@/types/account';
 import type { Bucket, CreateBucketInput } from '@/types/bucket';
@@ -83,26 +85,16 @@ export function BucketFormModal({ bucket, accounts, onClose, onSubmit }: BucketF
 
         <label className="flex flex-col gap-1 text-sm text-text-muted">
           Monto objetivo <span className="text-text-subtle">(opcional)</span>
-          <input
-            type="number"
-            inputMode="decimal"
-            min="1"
-            step="any"
+          <MoneyInput
             value={targetAmount}
-            onChange={(e) => setTargetAmount(e.target.value)}
+            onChange={setTargetAmount}
             placeholder="Sin meta fija"
-            className={FIELD_CLASS}
           />
         </label>
 
         <label className="flex flex-col gap-1 text-sm text-text-muted">
           Fecha objetivo <span className="text-text-subtle">(opcional)</span>
-          <input
-            type="date"
-            value={targetDate}
-            onChange={(e) => setTargetDate(e.target.value)}
-            className={FIELD_CLASS}
-          />
+          <DatePicker value={targetDate} onChange={setTargetDate} />
         </label>
 
         <label className="flex flex-col gap-1 text-sm text-text-muted">

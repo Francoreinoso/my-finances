@@ -57,3 +57,45 @@ button {
     animation: none;
   }
 }
+
+/* ── Calendario (react-day-picker) ──────────────────────────────────────
+   El CSS base de la librería se importa en DatePicker.tsx; acá lo vestimos
+   con la paleta del prisma. Las variables --rdp-* las define la librería en
+   .rdp-root, así que las sobrescribimos con esa misma especificidad. */
+.mf-calendar .rdp-root {
+  --rdp-accent-color: var(--accent);
+  --rdp-accent-background-color: var(--accent-muted);
+  --rdp-today-color: var(--accent-cyan);
+  --rdp-day-width: 2.5rem;
+  --rdp-day-height: 2.5rem;
+  --rdp-outside-opacity: 0.4;
+  --rdp-disabled-opacity: 0.35;
+  color: var(--text-primary);
+}
+
+/* Encabezado: el mes (lo capitaliza el ::first-letter) y las flechas. */
+.mf-calendar .rdp-caption_label::first-letter {
+  text-transform: uppercase;
+}
+.mf-calendar .rdp-chevron {
+  fill: var(--text-muted);
+}
+.mf-calendar .rdp-button_previous:hover .rdp-chevron,
+.mf-calendar .rdp-button_next:hover .rdp-chevron {
+  fill: var(--accent);
+}
+
+/* Nombres de los días de la semana. */
+.mf-calendar .rdp-weekday {
+  color: var(--text-subtle);
+  font-weight: 500;
+}
+
+/* Días: esquinas redondeadas y hover sutil. El seleccionado y el de hoy los
+   pinta la librería con las variables --rdp-* de arriba. */
+.mf-calendar .rdp-day_button {
+  border-radius: 0.375rem;
+}
+.mf-calendar .rdp-day_button:hover {
+  background-color: var(--bg-elevated);
+}
