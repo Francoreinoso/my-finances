@@ -18,3 +18,10 @@ export interface Account {
 export interface AccountWithBalance extends Account {
   balance: number;
 }
+
+/** Datos para crear una cuenta nueva (el id, isArchived y createdAt los pone el caso de uso). */
+export interface CreateAccountInput {
+  name: string;
+  type: AccountType;
+  currency: Currency;
+}

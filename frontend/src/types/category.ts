@@ -5,6 +5,7 @@ export interface Category {
   name: string;
   type: CategoryType;
   color: string;
+  isArchived: boolean;
 }
 
 /** Datos para crear una categoría (body de POST). */

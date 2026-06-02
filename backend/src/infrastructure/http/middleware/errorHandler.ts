@@ -10,6 +10,7 @@ import {
 } from '@/domain/recurring/errors.js';
 import { BucketNotFoundError } from '@/domain/bucket/errors.js';
 import { CategoryNotFoundError } from '@/domain/category/errors.js';
+import { AccountNotFoundError, AccountValidationError } from '@/domain/account/errors.js';
 import { QueryValidationError } from '@/infrastructure/http/errors.js';
 
 /**
@@ -20,7 +21,8 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (
     err instanceof TransactionValidationError ||
     err instanceof QueryValidationError ||
-    err instanceof RecurringTransferValidationError
+    err instanceof RecurringTransferValidationError ||
+    err instanceof AccountValidationError
   ) {
     res.status(400).json({
       error: { code: 'VALIDATION_ERROR', message: err.message },
@@ -32,7 +34,8 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     err instanceof TransactionNotFoundError ||
     err instanceof RecurringTransferNotFoundError ||
     err instanceof BucketNotFoundError ||
-    err instanceof CategoryNotFoundError
+    err instanceof CategoryNotFoundError ||
+    err instanceof AccountNotFoundError
   ) {
     res.status(404).json({
       error: { code: 'NOT_FOUND', message: err.message },

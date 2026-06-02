@@ -5,6 +5,7 @@ import type { BucketChanges } from '@/domain/bucket/Bucket.js';
 import { listBucketsWithProgress } from '@/application/bucket/listBucketsWithProgress.js';
 import { createBucket } from '@/application/bucket/createBucket.js';
 import { updateBucket } from '@/application/bucket/updateBucket.js';
+import { deleteBucket } from '@/application/bucket/deleteBucket.js';
 import type {
   CreateBucketRequest,
   UpdateBucketRequest,
@@ -33,6 +34,11 @@ export function makeBucketController(buckets: BucketRepository, accounts: Accoun
       if (body.accountId !== undefined) changes.accountId = body.accountId;
       const bucket = await updateBucket(buckets, req.params.id, changes);
       res.json(bucket);
+    },
+
+    remove: async (req: Request<IdParams>, res: Response): Promise<void> => {
+      const result = await deleteBucket(buckets, req.params.id);
+      res.json(result);
     },
   };
 }

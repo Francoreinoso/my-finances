@@ -26,6 +26,7 @@ export const categories = sqliteTable('categories', {
   name: text('name').notNull(),
   type: text('type', { enum: ['income', 'expense'] }).notNull(),
   color: text('color').notNull(),
+  isArchived: integer('is_archived', { mode: 'boolean' }).notNull().default(false),
 });
 
 export const buckets = sqliteTable('buckets', {
@@ -34,6 +35,7 @@ export const buckets = sqliteTable('buckets', {
   targetAmount: real('target_amount'),
   targetDate: text('target_date'),
   accountId: text('account_id').references(() => accounts.id),
+  isArchived: integer('is_archived', { mode: 'boolean' }).notNull().default(false),
 });
 
 export const recurringTransfers = sqliteTable('recurring_transfers', {
@@ -50,6 +52,7 @@ export const recurringTransfers = sqliteTable('recurring_transfers', {
   dayOfMonth: integer('day_of_month').notNull(),
   nextDueDate: text('next_due_date').notNull(),
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  isArchived: integer('is_archived', { mode: 'boolean' }).notNull().default(false),
 });
 
 export const transactions = sqliteTable('transactions', {

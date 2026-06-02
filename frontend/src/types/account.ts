@@ -14,3 +14,10 @@ export interface Account {
   createdAt: string;
   balance: number;
 }
+
+/** Datos para crear una cuenta nueva (el id, isArchived y createdAt los pone el backend). */
+export interface CreateAccountInput {
+  name: string;
+  type: AccountType;
+  currency: Currency;
+}

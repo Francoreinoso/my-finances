@@ -11,5 +11,6 @@ export function makeCategoryRouter(controller: CategoryController): Router {
   router.get('/', controller.list);
   router.post('/', validateBody(createCategorySchema), controller.create);
   router.patch('/:id', validateBody(updateCategorySchema), controller.update);
+  router.delete('/:id', controller.remove);
   return router;
 }

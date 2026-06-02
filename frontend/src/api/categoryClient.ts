@@ -1,4 +1,5 @@
 import type { Category, CreateCategoryInput, CategoryChanges } from '@/types/category';
+import type { DeleteResult } from '@/types/delete';
 import { request } from '@/api/http';
 
 export const categoryClient = {
@@ -13,6 +14,9 @@ export const categoryClient = {
       method: 'PATCH',
       body: JSON.stringify(changes),
     });
+  },
+  remove(id: string): Promise<DeleteResult> {
+    return request<DeleteResult>(`/categories/${id}`, { method: 'DELETE' });
   },
 };
 

@@ -31,7 +31,11 @@ export function EditTransactionModal({
 
   // El tipo y las cuentas no se editan; solo monto, fecha, categoría y descripción.
   const isTransfer = transaction.type === 'transfer';
-  const visibleCategories = categories.filter((c) => c.type === transaction.type);
+  // Mostramos las categorías activas + la que ya está asignada (aunque esté
+  // archivada): así el usuario puede conservarla en una edición sin "perderla".
+  const visibleCategories = categories.filter(
+    (c) => c.type === transaction.type && (!c.isArchived || c.id === transaction.categoryId),
+  );
   const amountNumber = Number(amount);
   const amountOk = Number.isFinite(amountNumber) && amountNumber > 0;
   const showAmountError = amountTouched && !amountOk;

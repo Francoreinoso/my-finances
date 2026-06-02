@@ -16,7 +16,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     >
       <header className="flex items-center justify-between border-b border-border-default p-4">
         {!collapsed && (
-          <p className="font-mono text-lg tracking-tight text-accent">my-finanzas</p>
+          <p className="font-mono text-lg tracking-tight text-accent">My finances</p>
         )}
         <button
           type="button"
@@ -36,13 +36,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <SidebarItem key={item.id} item={item} collapsed={collapsed} />
         ))}
       </nav>
-
-      {!collapsed && (
-        <footer className="mt-auto border-t border-border-default p-4 text-xs text-text-subtle">
-          <p>v0.1.0</p>
-          <p className="mt-1">Tu plata, ordenada.</p>
-        </footer>
-      )}
     </aside>
   );
 }

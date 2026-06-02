@@ -11,6 +11,7 @@ export async function createCategory(
     name: input.name,
     type: input.type,
     color: input.color,
+    isArchived: false,
   };
   await categories.save(category);
   return category;

@@ -4,6 +4,7 @@ import type { CategoryChanges } from '@/domain/category/Category.js';
 import { listCategories } from '@/application/category/listCategories.js';
 import { createCategory } from '@/application/category/createCategory.js';
 import { updateCategory } from '@/application/category/updateCategory.js';
+import { deleteCategory } from '@/application/category/deleteCategory.js';
 import type {
   CreateCategoryRequest,
   UpdateCategoryRequest,
@@ -30,6 +31,11 @@ export function makeCategoryController(categories: CategoryRepository) {
       if (body.color !== undefined) changes.color = body.color;
       const category = await updateCategory(categories, req.params.id, changes);
       res.json(category);
+    },
+
+    remove: async (req: Request<IdParams>, res: Response): Promise<void> => {
+      const result = await deleteCategory(categories, req.params.id);
+      res.json(result);
     },
   };
 }

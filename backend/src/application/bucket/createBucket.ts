@@ -15,6 +15,7 @@ export async function createBucket(
     targetAmount: input.targetAmount,
     targetDate: input.targetDate,
     accountId: input.accountId,
+    isArchived: false,
   };
   await buckets.save(bucket);
   return bucket;

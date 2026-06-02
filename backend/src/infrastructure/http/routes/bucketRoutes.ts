@@ -11,5 +11,6 @@ export function makeBucketRouter(controller: BucketController): Router {
   router.get('/', controller.list);
   router.post('/', validateBody(createBucketSchema), controller.create);
   router.patch('/:id', validateBody(updateBucketSchema), controller.update);
+  router.delete('/:id', controller.remove);
   return router;
 }

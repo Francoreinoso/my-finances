@@ -4,9 +4,10 @@ import type { Category } from '@/types/category';
 interface CategoryRowProps {
   category: Category;
   onEdit: () => void;
+  onDelete: () => void;
 }
 
-export function CategoryRow({ category, onEdit }: CategoryRowProps) {
+export function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
   return (
     <div className="flex items-center gap-3 rounded-lg border border-border-default bg-bg-surface/70 px-4 py-3 backdrop-blur-sm">
       <span
@@ -22,6 +23,9 @@ export function CategoryRow({ category, onEdit }: CategoryRowProps) {
       </span>
       <Button variant="ghost" className="shrink-0" onClick={onEdit}>
         Editar
+      </Button>
+      <Button variant="danger" size="sm" className="shrink-0" onClick={onDelete}>
+        Eliminar
       </Button>
     </div>
   );

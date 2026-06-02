@@ -1,7 +1,10 @@
-import { eq } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 import type { Bucket } from '@/domain/bucket/Bucket.js';
-import type { BucketRepository } from '@/domain/bucket/BucketRepository.js';
-import { buckets, type BucketRow } from './schema.js';
+import type {
+  BucketReferenceCounts,
+  BucketRepository,
+} from '@/domain/bucket/BucketRepository.js';
+import { buckets, recurringTransfers, transactions, type BucketRow } from './schema.js';
 import type { DB } from './db.js';
 
 function toBucket(row: BucketRow): Bucket {
@@ -11,6 +14,7 @@ function toBucket(row: BucketRow): Bucket {
     targetAmount: row.targetAmount,
     targetDate: row.targetDate,
     accountId: row.accountId,
+    isArchived: row.isArchived,
   };
 }
 
@@ -34,6 +38,7 @@ export class SqliteBucketRepository implements BucketRepository {
       targetAmount: bucket.targetAmount,
       targetDate: bucket.targetDate,
       accountId: bucket.accountId,
+      isArchived: bucket.isArchived,
     };
     this.db
       .insert(buckets)
@@ -45,9 +50,32 @@ export class SqliteBucketRepository implements BucketRepository {
           targetAmount: values.targetAmount,
           targetDate: values.targetDate,
           accountId: values.accountId,
+          isArchived: values.isArchived,
         },
       })
       .run();
     return Promise.resolve();
+  }
+
+  delete(id: string): Promise<void> {
+    this.db.delete(buckets).where(eq(buckets.id, id)).run();
+    return Promise.resolve();
+  }
+
+  findReferenceCounts(id: string): Promise<BucketReferenceCounts> {
+    const [txRow] = this.db
+      .select({ n: count() })
+      .from(transactions)
+      .where(eq(transactions.bucketId, id))
+      .all();
+    const [recurringRow] = this.db
+      .select({ n: count() })
+      .from(recurringTransfers)
+      .where(eq(recurringTransfers.bucketId, id))
+      .all();
+    return Promise.resolve({
+      transactions: Number(txRow?.n ?? 0),
+      recurring: Number(recurringRow?.n ?? 0),
+    });
   }
 }

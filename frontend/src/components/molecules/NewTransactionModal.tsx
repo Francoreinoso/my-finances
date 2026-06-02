@@ -34,11 +34,12 @@ export function NewTransactionModal({
   onClose,
   onSubmit,
 }: NewTransactionModalProps) {
+  const initialActive = accounts.filter((a) => !a.isArchived);
   const [type, setType] = useState<TransactionType>('expense');
   const [amount, setAmount] = useState('');
-  const [accountId, setAccountId] = useState(accounts[0]?.id ?? '');
-  const [fromAccountId, setFromAccountId] = useState(accounts[0]?.id ?? '');
-  const [toAccountId, setToAccountId] = useState(accounts[1]?.id ?? '');
+  const [accountId, setAccountId] = useState(initialActive[0]?.id ?? '');
+  const [fromAccountId, setFromAccountId] = useState(initialActive[0]?.id ?? '');
+  const [toAccountId, setToAccountId] = useState(initialActive[1]?.id ?? '');
   const [categoryId, setCategoryId] = useState('');
   const [date, setDate] = useState(todayISO());
   const [description, setDescription] = useState('');
@@ -48,7 +49,9 @@ export function NewTransactionModal({
   const amountErrorId = useId();
 
   const isTransfer = type === 'transfer';
-  const visibleCategories = categories.filter((c) => c.type === type);
+  // Para una transacción nueva: solo cuentas y categorías activas.
+  const activeAccounts = initialActive;
+  const visibleCategories = categories.filter((c) => c.type === type && !c.isArchived);
   const amountNumber = Number(amount);
   const amountOk = Number.isFinite(amountNumber) && amountNumber > 0;
   const showAmountError = amountTouched && !amountOk;
@@ -151,7 +154,7 @@ export function NewTransactionModal({
                 onChange={(e) => setFromAccountId(e.target.value)}
                 className={FIELD_CLASS}
               >
-                {accounts.map((a) => (
+                {activeAccounts.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.name}
                   </option>
@@ -165,7 +168,7 @@ export function NewTransactionModal({
                 onChange={(e) => setToAccountId(e.target.value)}
                 className={FIELD_CLASS}
               >
-                {accounts.map((a) => (
+                {activeAccounts.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.name}
                   </option>
@@ -185,7 +188,7 @@ export function NewTransactionModal({
                 onChange={(e) => setAccountId(e.target.value)}
                 className={FIELD_CLASS}
               >
-                {accounts.map((a) => (
+                {activeAccounts.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.name}
                   </option>

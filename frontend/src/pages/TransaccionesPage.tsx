@@ -75,7 +75,7 @@ export function TransaccionesPage() {
 
       {status === 'ready' && (
         <div className="flex flex-col gap-6">
-          <AccountsBar accounts={accounts} />
+          <AccountsBar accounts={accounts.filter((a) => !a.isArchived)} />
           {transactions.length === 0 ? (
             <EmptyState
               title="Sin transacciones todavía"

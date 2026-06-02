@@ -12,6 +12,7 @@ export interface Bucket {
   accountId: string | null;
   progress: number;
   currency: Currency;
+  isArchived: boolean;
 }
 
 /** Datos para crear un bucket (body de POST). */

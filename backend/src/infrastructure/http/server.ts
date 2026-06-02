@@ -67,7 +67,11 @@ export function createApp(deps: ServerDeps): Express {
   const bucketController = makeBucketController(deps.bucketRepository, deps.accountRepository);
   app.use('/api/buckets', makeBucketRouter(bucketController));
 
-  const recurringController = makeRecurringController(deps.recurringRepository);
+  const recurringController = makeRecurringController(
+    deps.recurringRepository,
+    deps.accountRepository,
+    deps.bucketRepository,
+  );
   app.use('/api/recurring', makeRecurringRouter(recurringController));
 
   const reportController = makeReportController(deps.reportRepository, deps.categoryRepository);

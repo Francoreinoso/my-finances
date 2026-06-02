@@ -1,7 +1,7 @@
-import { eq } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 import type { Category } from '@/domain/category/Category.js';
 import type { CategoryRepository } from '@/domain/category/CategoryRepository.js';
-import { categories, type CategoryRow } from './schema.js';
+import { categories, transactions, type CategoryRow } from './schema.js';
 import type { DB } from './db.js';
 
 function toCategory(row: CategoryRow): Category {
@@ -10,6 +10,7 @@ function toCategory(row: CategoryRow): Category {
     name: row.name,
     type: row.type,
     color: row.color,
+    isArchived: row.isArchived,
   };
 }
 
@@ -32,15 +33,35 @@ export class SqliteCategoryRepository implements CategoryRepository {
       name: category.name,
       type: category.type,
       color: category.color,
+      isArchived: category.isArchived,
     };
     this.db
       .insert(categories)
       .values(values)
       .onConflictDoUpdate({
         target: categories.id,
-        set: { name: values.name, type: values.type, color: values.color },
+        set: {
+          name: values.name,
+          type: values.type,
+          color: values.color,
+          isArchived: values.isArchived,
+        },
       })
       .run();
     return Promise.resolve();
+  }
+
+  delete(id: string): Promise<void> {
+    this.db.delete(categories).where(eq(categories.id, id)).run();
+    return Promise.resolve();
+  }
+
+  countTransactions(id: string): Promise<number> {
+    const [row] = this.db
+      .select({ n: count() })
+      .from(transactions)
+      .where(eq(transactions.categoryId, id))
+      .all();
+    return Promise.resolve(Number(row?.n ?? 0));
   }
 }

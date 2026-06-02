@@ -12,6 +12,7 @@ export interface RecurringTransfer {
   dayOfMonth: number;
   nextDueDate: string;
   isActive: boolean;
+  isArchived: boolean;
   pending: boolean;
 }
 
@@ -19,4 +20,14 @@ export interface RecurringTransfer {
 export interface RecurringTransferChanges {
   amount?: number;
   isActive?: boolean;
+}
+
+/** Datos para crear un aporte recurrente nuevo (body de POST). */
+export interface CreateRecurringTransferInput {
+  name: string;
+  fromAccountId: string;
+  toAccountId: string;
+  amount: number;
+  bucketId: string | null;
+  dayOfMonth: number;
 }

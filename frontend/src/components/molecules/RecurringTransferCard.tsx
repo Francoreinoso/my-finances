@@ -8,12 +8,14 @@ interface RecurringTransferCardProps {
   recurring: RecurringTransfer;
   onConfirm: (id: string) => Promise<void>;
   onUpdate: (id: string, changes: RecurringTransferChanges) => Promise<void>;
+  onDelete: () => void;
 }
 
 export function RecurringTransferCard({
   recurring,
   onConfirm,
   onUpdate,
+  onDelete,
 }: RecurringTransferCardProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +76,9 @@ export function RecurringTransferCard({
         )}
         <Button variant="ghost" type="button" onClick={() => setEditing(true)}>
           Editar
+        </Button>
+        <Button variant="danger" size="sm" type="button" onClick={onDelete}>
+          Eliminar
         </Button>
       </div>
 

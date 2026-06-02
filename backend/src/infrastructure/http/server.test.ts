@@ -42,6 +42,75 @@ describe('API HTTP', () => {
     expect((res.body as { balance: number }[]).every((a) => a.balance === 0)).toBe(true);
   });
 
+  it('POST /api/accounts crea una cuenta y aparece en el listado', async () => {
+    const res = await request(app)
+      .post('/api/accounts')
+      .send({ name: 'Banco Estado', type: 'checking', currency: 'CLP' });
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({ name: 'Banco Estado', type: 'checking', currency: 'CLP' });
+
+    const listRes = await request(app).get('/api/accounts');
+    expect(listRes.body).toHaveLength(5);
+  });
+
+  it('POST /api/accounts sin name devuelve 400', async () => {
+    const res = await request(app)
+      .post('/api/accounts')
+      .send({ type: 'checking', currency: 'CLP' });
+    expect(res.status).toBe(400);
+  });
+
+  it('POST /api/accounts con type inválido devuelve 400', async () => {
+    const res = await request(app)
+      .post('/api/accounts')
+      .send({ name: 'X', type: 'crypto', currency: 'CLP' });
+    expect(res.status).toBe(400);
+  });
+
+  it('POST /api/accounts sin currency usa CLP por default', async () => {
+    const res = await request(app)
+      .post('/api/accounts')
+      .send({ name: 'Caja chica', type: 'cash' });
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({ currency: 'CLP' });
+  });
+
+  it('DELETE /api/accounts/:id sin deps responde 200 con mode "deleted"', async () => {
+    const created = await request(app)
+      .post('/api/accounts')
+      .send({ name: 'Banco Estado', type: 'checking', currency: 'CLP' });
+    const id = (created.body as { id: string }).id;
+    const res = await request(app).delete(`/api/accounts/${id}`);
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ mode: 'deleted' });
+
+    const listRes = await request(app).get('/api/accounts');
+    expect((listRes.body as { id: string }[]).find((a) => a.id === id)).toBeUndefined();
+  });
+
+  it('DELETE /api/accounts/:id con deps responde 200 con mode "archived"', async () => {
+    // acc_dap del seed está referenciada por un bucket y un recurring, balance 0.
+    const res = await request(app).delete('/api/accounts/acc_dap');
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ mode: 'archived' });
+  });
+
+  it('DELETE /api/accounts/:id con balance != 0 devuelve 400', async () => {
+    await request(app).post('/api/transactions').send({
+      type: 'income',
+      date: '2026-05-20',
+      amount: 50000,
+      accountId: 'acc_santander',
+    });
+    const res = await request(app).delete('/api/accounts/acc_santander');
+    expect(res.status).toBe(400);
+  });
+
+  it('DELETE /api/accounts/:id inexistente devuelve 404', async () => {
+    const res = await request(app).delete('/api/accounts/acc_FANTASMA');
+    expect(res.status).toBe(404);
+  });
+
   it('GET /api/categories devuelve las categorías del seed', async () => {
     const res = await request(app).get('/api/categories');
     expect(res.status).toBe(200);
@@ -150,6 +219,71 @@ describe('API HTTP', () => {
     expect(res.body).toHaveLength(3);
   });
 
+  it('POST /api/recurring crea un aporte y aparece en el listado', async () => {
+    const res = await request(app).post('/api/recurring').send({
+      name: 'Aporte Test',
+      fromAccountId: 'acc_santander',
+      toAccountId: 'acc_dap',
+      amount: 50000,
+      bucketId: 'bk_mudanza',
+      dayOfMonth: 15,
+    });
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({
+      name: 'Aporte Test',
+      amount: 50000,
+      isActive: true,
+    });
+
+    const listRes = await request(app).get('/api/recurring');
+    expect(listRes.body).toHaveLength(4);
+  });
+
+  it('POST /api/recurring sin bucketId lo deja como null', async () => {
+    const res = await request(app).post('/api/recurring').send({
+      name: 'Aporte sin bucket',
+      fromAccountId: 'acc_santander',
+      toAccountId: 'acc_dap',
+      amount: 10000,
+      dayOfMonth: 8,
+    });
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({ bucketId: null });
+  });
+
+  it('POST /api/recurring con misma cuenta origen/destino devuelve 400', async () => {
+    const res = await request(app).post('/api/recurring').send({
+      name: 'X',
+      fromAccountId: 'acc_santander',
+      toAccountId: 'acc_santander',
+      amount: 10000,
+      dayOfMonth: 8,
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it('POST /api/recurring con cuenta inexistente devuelve 400', async () => {
+    const res = await request(app).post('/api/recurring').send({
+      name: 'X',
+      fromAccountId: 'acc_FANTASMA',
+      toAccountId: 'acc_dap',
+      amount: 10000,
+      dayOfMonth: 8,
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it('POST /api/recurring con dayOfMonth fuera de rango lo rechaza Zod con 400', async () => {
+    const res = await request(app).post('/api/recurring').send({
+      name: 'X',
+      fromAccountId: 'acc_santander',
+      toAccountId: 'acc_dap',
+      amount: 10000,
+      dayOfMonth: 32,
+    });
+    expect(res.status).toBe(400);
+  });
+
   it('POST /api/recurring/:id/confirm de un aporte inexistente devuelve 404', async () => {
     const res = await request(app).post('/api/recurring/rec_FANTASMA/confirm');
     expect(res.status).toBe(404);
@@ -251,6 +385,74 @@ describe('API HTTP', () => {
       .post('/api/categories')
       .send({ name: 'X', type: 'expense', color: 'rojo' });
     expect(res.status).toBe(400);
+  });
+
+  it('DELETE /api/categories/:id sin uso responde mode "deleted"', async () => {
+    const created = await request(app)
+      .post('/api/categories')
+      .send({ name: 'Mascotas', type: 'expense', color: '#ff00ff' });
+    const id = (created.body as { id: string }).id;
+    const res = await request(app).delete(`/api/categories/${id}`);
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ mode: 'deleted' });
+  });
+
+  it('DELETE /api/categories/:id usada por una transacción responde mode "archived"', async () => {
+    await request(app).post('/api/transactions').send({
+      type: 'expense',
+      date: '2026-05-20',
+      amount: 5000,
+      accountId: 'acc_santander',
+      categoryId: 'cat_comida',
+    });
+    const res = await request(app).delete('/api/categories/cat_comida');
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ mode: 'archived' });
+  });
+
+  it('DELETE /api/categories/:id inexistente devuelve 404', async () => {
+    const res = await request(app).delete('/api/categories/cat_FANTASMA');
+    expect(res.status).toBe(404);
+  });
+
+  it('DELETE /api/buckets/:id sin uso responde mode "deleted"', async () => {
+    const created = await request(app)
+      .post('/api/buckets')
+      .send({ name: 'Viaje', targetAmount: 1000, targetDate: null, accountId: null });
+    const id = (created.body as { id: string }).id;
+    const res = await request(app).delete(`/api/buckets/${id}`);
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ mode: 'deleted' });
+  });
+
+  it('DELETE /api/buckets/:id usado por recurring del seed responde mode "archived"', async () => {
+    const res = await request(app).delete('/api/buckets/bk_mudanza');
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ mode: 'archived' });
+  });
+
+  it('DELETE /api/buckets/:id inexistente devuelve 404', async () => {
+    const res = await request(app).delete('/api/buckets/bk_FANTASMA');
+    expect(res.status).toBe(404);
+  });
+
+  it('DELETE /api/recurring/:id sin confirmaciones responde mode "deleted"', async () => {
+    const created = await request(app).post('/api/recurring').send({
+      name: 'Aporte test',
+      fromAccountId: 'acc_santander',
+      toAccountId: 'acc_dap',
+      amount: 10000,
+      dayOfMonth: 8,
+    });
+    const id = (created.body as { id: string }).id;
+    const res = await request(app).delete(`/api/recurring/${id}`);
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ mode: 'deleted' });
+  });
+
+  it('DELETE /api/recurring/:id inexistente devuelve 404', async () => {
+    const res = await request(app).delete('/api/recurring/rec_FANTASMA');
+    expect(res.status).toBe(404);
   });
 
   it('GET /api/transactions/export devuelve un CSV', async () => {

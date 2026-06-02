@@ -10,6 +10,7 @@ export interface Bucket {
   targetAmount: number | null;
   targetDate: string | null;
   accountId: string | null;
+  isArchived: boolean;
 }
 
 /**

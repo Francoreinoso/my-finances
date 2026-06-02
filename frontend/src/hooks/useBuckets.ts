@@ -14,6 +14,7 @@ export interface UseBuckets {
   error: string | null;
   create: (input: CreateBucketInput) => Promise<void>;
   update: (id: string, changes: BucketChanges) => Promise<void>;
+  remove: (id: string) => Promise<void>;
 }
 
 function toMessage(e: unknown): string {
@@ -72,5 +73,14 @@ export function useBuckets(): UseBuckets {
     [reloadBuckets, notify],
   );
 
-  return { buckets, accounts, status, error, create, update };
+  const remove = useCallback(
+    async (id: string) => {
+      const result = await bucketClient.remove(id);
+      await reloadBuckets();
+      notify(result.mode === 'archived' ? 'Bucket archivado' : 'Bucket eliminado');
+    },
+    [reloadBuckets, notify],
+  );
+
+  return { buckets, accounts, status, error, create, update, remove };
 }

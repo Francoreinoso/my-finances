@@ -34,9 +34,10 @@ function ProgressBar({
 interface BucketProgressCardProps {
   bucket: Bucket;
   onEdit: () => void;
+  onDelete: () => void;
 }
 
-export function BucketProgressCard({ bucket, onEdit }: BucketProgressCardProps) {
+export function BucketProgressCard({ bucket, onEdit, onDelete }: BucketProgressCardProps) {
   const { name, targetAmount, targetDate, progress, currency } = bucket;
   const hasTarget = targetAmount !== null && targetAmount > 0;
 
@@ -46,12 +47,15 @@ export function BucketProgressCard({ bucket, onEdit }: BucketProgressCardProps) 
         <h3 className="min-w-0 truncate font-medium text-text-primary" title={name}>
           {name}
         </h3>
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2">
           {targetDate !== null && (
-            <span className="font-mono text-xs text-text-subtle">meta: {targetDate}</span>
+            <span className="mr-1 font-mono text-xs text-text-subtle">meta: {targetDate}</span>
           )}
           <Button variant="ghost" onClick={onEdit}>
             Editar
+          </Button>
+          <Button variant="danger" size="sm" onClick={onDelete}>
+            Eliminar
           </Button>
         </div>
       </div>

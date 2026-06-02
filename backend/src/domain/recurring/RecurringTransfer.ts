@@ -10,6 +10,19 @@ export interface RecurringTransferSnapshot {
   dayOfMonth: number;
   nextDueDate: string;
   isActive: boolean;
+  isArchived: boolean;
+}
+
+/** Datos para crear un aporte recurrente nuevo. */
+export interface CreateRecurringTransferInput {
+  name: string;
+  fromAccountId: string;
+  toAccountId: string;
+  amount: number;
+  bucketId: string | null;
+  dayOfMonth: number;
+  /** Fecha ISO YYYY-MM-DD desde la que calcular el nextDueDate. */
+  today: string;
 }
 
 /**
@@ -50,6 +63,37 @@ function nextMonthDate(currentDate: string, dayOfMonth: number): string {
 }
 
 /**
+ * Próxima ocurrencia futura de `dayOfMonth` desde `today`. Si el día ya pasó
+ * o es HOY, salta al mes siguiente (no asumimos que la transferencia ya se
+ * hizo hoy). Si el día no existe en el mes destino, recorta al último día.
+ */
+function firstDueDateFrom(today: string, dayOfMonth: number): string {
+  const year = Number(today.slice(0, 4));
+  const month = Number(today.slice(5, 7));
+  const todayDay = Number(today.slice(8, 10));
+
+  // Si pediste el 31 y el mes solo tiene 30, "este mes" para vos es el 30.
+  const daysInThisMonth = new Date(year, month, 0).getDate();
+  const dayThisMonth = Math.min(dayOfMonth, daysInThisMonth);
+
+  let targetYear = year;
+  let targetMonth = month;
+  if (todayDay >= dayThisMonth) {
+    targetMonth += 1;
+    if (targetMonth > 12) {
+      targetMonth = 1;
+      targetYear += 1;
+    }
+  }
+
+  const daysInTarget = new Date(targetYear, targetMonth, 0).getDate();
+  const day = Math.min(dayOfMonth, daysInTarget);
+  return `${String(targetYear)}-${pad(targetMonth)}-${pad(day)}`;
+}
+
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
  * Un aporte recurrente: una transferencia programada que se repite cada mes.
  * El estado "pendiente" NO se persiste — se deriva de la fecha (ver isPending).
  */
@@ -63,6 +107,7 @@ export class RecurringTransfer {
   readonly dayOfMonth: number;
   readonly nextDueDate: string;
   readonly isActive: boolean;
+  readonly isArchived: boolean;
 
   private constructor(snapshot: RecurringTransferSnapshot) {
     this.id = snapshot.id;
@@ -74,10 +119,56 @@ export class RecurringTransfer {
     this.dayOfMonth = snapshot.dayOfMonth;
     this.nextDueDate = snapshot.nextDueDate;
     this.isActive = snapshot.isActive;
+    this.isArchived = snapshot.isArchived;
   }
 
   static fromPersistence(snapshot: RecurringTransferSnapshot): RecurringTransfer {
     return new RecurringTransfer(snapshot);
+  }
+
+  /**
+   * Crea un aporte recurrente nuevo. Valida la FORMA: nombre no vacío, monto
+   * positivo, dayOfMonth ∈ [1,31], cuentas distintas. La existencia de las
+   * cuentas/bucket la valida el caso de uso (acceso a repositorios).
+   */
+  static create(input: CreateRecurringTransferInput): RecurringTransfer {
+    const name = input.name.trim();
+    if (name === '') {
+      throw new RecurringTransferValidationError('El nombre es requerido');
+    }
+    if (!Number.isFinite(input.amount) || input.amount <= 0) {
+      throw new RecurringTransferValidationError('El monto del aporte debe ser mayor a cero');
+    }
+    if (
+      !Number.isInteger(input.dayOfMonth) ||
+      input.dayOfMonth < 1 ||
+      input.dayOfMonth > 31
+    ) {
+      throw new RecurringTransferValidationError('El día del mes debe ser un entero entre 1 y 31');
+    }
+    if (input.fromAccountId === input.toAccountId) {
+      throw new RecurringTransferValidationError(
+        'La cuenta de origen y la de destino no pueden ser la misma',
+      );
+    }
+    if (!ISO_DATE_REGEX.test(input.today)) {
+      throw new RecurringTransferValidationError(
+        `today debe estar en formato YYYY-MM-DD (recibido: "${input.today}")`,
+      );
+    }
+
+    return new RecurringTransfer({
+      id: crypto.randomUUID(),
+      name,
+      fromAccountId: input.fromAccountId,
+      toAccountId: input.toAccountId,
+      amount: input.amount,
+      bucketId: input.bucketId,
+      dayOfMonth: input.dayOfMonth,
+      nextDueDate: firstDueDateFrom(input.today, input.dayOfMonth),
+      isActive: true,
+      isArchived: false,
+    });
   }
 
   /** Pendiente = activo y con la fecha ya cumplida (las fechas ISO se comparan como texto). */
@@ -120,6 +211,7 @@ export class RecurringTransfer {
       dayOfMonth: this.dayOfMonth,
       nextDueDate: this.nextDueDate,
       isActive: this.isActive,
+      isArchived: this.isArchived,
     };
   }
 }

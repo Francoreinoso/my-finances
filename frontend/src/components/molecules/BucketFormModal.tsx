@@ -16,12 +16,17 @@ interface BucketFormModalProps {
 }
 
 export function BucketFormModal({ bucket, accounts, onClose, onSubmit }: BucketFormModalProps) {
+  // Cuentas activas + la actualmente vinculada (aunque esté archivada): así no
+  // se "pierde" silenciosamente la cuenta de un bucket al editarlo.
+  const visibleAccounts = accounts.filter(
+    (a) => !a.isArchived || a.id === bucket?.accountId,
+  );
   const [name, setName] = useState(bucket?.name ?? '');
   const [targetAmount, setTargetAmount] = useState(
     bucket?.targetAmount != null ? String(bucket.targetAmount) : '',
   );
   const [targetDate, setTargetDate] = useState(bucket?.targetDate ?? '');
-  const [accountId, setAccountId] = useState(bucket?.accountId ?? accounts[0]?.id ?? '');
+  const [accountId, setAccountId] = useState(bucket?.accountId ?? visibleAccounts[0]?.id ?? '');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nameTouched, setNameTouched] = useState(false);
@@ -105,7 +110,7 @@ export function BucketFormModal({ bucket, accounts, onClose, onSubmit }: BucketF
             className={FIELD_CLASS}
           >
             <option value="">Sin cuenta</option>
-            {accounts.map((a) => (
+            {visibleAccounts.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}
               </option>

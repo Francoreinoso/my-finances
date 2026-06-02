@@ -11,6 +11,7 @@ export interface UseCategories {
   error: string | null;
   create: (input: CreateCategoryInput) => Promise<void>;
   update: (id: string, changes: CategoryChanges) => Promise<void>;
+  remove: (id: string) => Promise<void>;
 }
 
 function toMessage(e: unknown): string {
@@ -59,5 +60,14 @@ export function useCategories(): UseCategories {
     [notify],
   );
 
-  return { categories, status, error, create, update };
+  const remove = useCallback(
+    async (id: string) => {
+      const result = await categoryClient.remove(id);
+      setCategories(await categoryClient.list());
+      notify(result.mode === 'archived' ? 'Categoría archivada' : 'Categoría eliminada');
+    },
+    [notify],
+  );
+
+  return { categories, status, error, create, update, remove };
 }

@@ -1,10 +1,18 @@
-import type { RecurringTransfer, RecurringTransferChanges } from '@/types/recurring';
+import type {
+  CreateRecurringTransferInput,
+  RecurringTransfer,
+  RecurringTransferChanges,
+} from '@/types/recurring';
+import type { DeleteResult } from '@/types/delete';
 import type { Transaction } from '@/types/transaction';
 import { request } from '@/api/http';
 
 export const recurringClient = {
   list(): Promise<RecurringTransfer[]> {
     return request<RecurringTransfer[]>('/recurring');
+  },
+  create(input: CreateRecurringTransferInput): Promise<void> {
+    return request<void>('/recurring', { method: 'POST', body: JSON.stringify(input) });
   },
   /** Confirma un aporte: el backend genera la transacción y avanza la fecha. */
   confirm(id: string): Promise<Transaction> {
@@ -16,6 +24,9 @@ export const recurringClient = {
       method: 'PATCH',
       body: JSON.stringify(changes),
     });
+  },
+  remove(id: string): Promise<DeleteResult> {
+    return request<DeleteResult>(`/recurring/${id}`, { method: 'DELETE' });
   },
 };
 

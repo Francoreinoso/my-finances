@@ -6,6 +6,7 @@ export interface Category {
   name: string;
   type: CategoryType;
   color: string;
+  isArchived: boolean;
 }
 
 /** Datos para crear una categoría nueva (el id lo genera el caso de uso). */
