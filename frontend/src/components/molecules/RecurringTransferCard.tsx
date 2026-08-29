@@ -60,7 +60,7 @@ export function RecurringTransferCard({
         <p className="mt-3 text-xs text-warning">Pausado — no genera avisos.</p>
       ) : recurring.pending ? (
         <p className="mt-3 text-xs text-text-muted">
-          Pendiente — confirmá cuando hayas hecho la transferencia.
+          Pendiente — confirma cuando hayas hecho la transferencia.
         </p>
       ) : (
         <p className="mt-3 text-xs text-text-subtle">

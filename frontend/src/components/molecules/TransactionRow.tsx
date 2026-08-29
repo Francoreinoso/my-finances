@@ -58,9 +58,9 @@ export function TransactionRow({
       <span role="cell" className="font-mono text-xs text-text-muted">
         {transaction.date}
       </span>
-      <span role="cell" className="min-w-0">
+      <span role="cell" className="min-w-0 overflow-hidden">
         {category ? (
-          <span className="inline-flex min-w-0 items-center gap-2">
+          <span className="flex min-w-0 items-center gap-2">
             <span
               className="h-2.5 w-2.5 shrink-0 rounded-full"
               style={{ backgroundColor: category.color }}

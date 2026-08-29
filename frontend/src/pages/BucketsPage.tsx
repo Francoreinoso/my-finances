@@ -54,7 +54,7 @@ export function BucketsPage() {
         (visible.length === 0 ? (
           <EmptyState
             title="Todavía no tenés buckets"
-            hint="Creá tu primera meta de ahorro con el botón de arriba."
+            hint="Crea tu primera meta de ahorro con el botón de arriba."
           />
         ) : (
           <div className="flex flex-col gap-4">

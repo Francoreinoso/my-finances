@@ -56,7 +56,7 @@ export function CuentasPage() {
         (visible.length === 0 ? (
           <EmptyState
             title="Todavía no tenés cuentas"
-            hint="Creá la primera con el botón de arriba."
+            hint="Crea la primera con el botón de arriba."
           />
         ) : (
           <div className="flex flex-col gap-2">
@@ -77,7 +77,7 @@ export function CuentasPage() {
       {deleting !== null && (
         <ConfirmDialog
           title={`Eliminar "${deleting.name}"`}
-          message="Si la cuenta no tiene movimientos, se borra definitivamente. Si tiene historia, queda archivada (no se pierde nada). Necesita saldo en cero — si tiene plata, transferí primero."
+          message="Si la cuenta no tiene movimientos, se borra definitivamente. Si tiene historia, queda archivada (no se pierde nada). Necesita saldo en cero — si tiene saldo, transfiere primero."
           confirmLabel="Eliminar"
           onConfirm={() => void handleDelete()}
           onClose={() => setDeleting(null)}

@@ -141,7 +141,7 @@ export function NewTransactionModal({
         </label>
         {showAmountError && (
           <p id={amountErrorId} className="text-xs text-danger">
-            Ingresá un monto mayor a 0.
+            Ingresa un monto mayor a 0.
           </p>
         )}
 
@@ -176,7 +176,7 @@ export function NewTransactionModal({
               </select>
             </label>
             {sameAccount && (
-              <p className="text-xs text-danger">Elegí una cuenta de destino distinta.</p>
+              <p className="text-xs text-danger">Elige una cuenta de destino distinta.</p>
             )}
           </>
         ) : (

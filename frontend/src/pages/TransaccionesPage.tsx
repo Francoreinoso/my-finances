@@ -79,7 +79,7 @@ export function TransaccionesPage() {
           {transactions.length === 0 ? (
             <EmptyState
               title="Sin transacciones todavía"
-              hint="Agregá la primera con el botón de arriba (o la tecla N)."
+              hint="Agrega la primera con el botón de arriba (o la tecla N)."
             />
           ) : (
             <div className="flex flex-col gap-3">

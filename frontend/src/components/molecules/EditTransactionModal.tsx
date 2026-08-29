@@ -85,7 +85,7 @@ export function EditTransactionModal({
         </label>
         {showAmountError && (
           <p id={amountErrorId} className="text-xs text-danger">
-            Ingresá un monto mayor a 0.
+            Ingresa un monto mayor a 0.
           </p>
         )}
 

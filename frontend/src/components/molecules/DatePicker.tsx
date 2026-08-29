@@ -78,7 +78,7 @@ export function DatePicker({ value, onChange, id }: DatePickerProps) {
         className={`${FIELD_CLASS} flex w-full items-center justify-between gap-2 text-left`}
       >
         <span className={selected ? 'text-text-primary' : 'text-text-subtle'}>
-          {selected ? formatDateReadable(value) : 'Elegí una fecha'}
+          {selected ? formatDateReadable(value) : 'Elige una fecha'}
         </span>
         <svg
           aria-hidden="true"

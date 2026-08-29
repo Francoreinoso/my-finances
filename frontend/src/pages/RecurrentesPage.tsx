@@ -39,7 +39,7 @@ export function RecurrentesPage() {
         <div>
           <h1 className="font-mono text-3xl tracking-tight text-text-primary">Recurrentes</h1>
           <p className="text-sm text-text-muted">
-            Tus aportes programados. Cuando uno vence, confirmá que ya lo transferiste.
+            Tus aportes programados. Cuando uno vence, confirma que ya lo transferiste.
           </p>
         </div>
         <Button onClick={() => setCreating(true)} disabled={!canCreate}>
@@ -62,13 +62,13 @@ export function RecurrentesPage() {
         (sorted.length === 0 ? (
           <EmptyState
             title="Todavía no hay aportes recurrentes"
-            hint="Creá el primero con el botón de arriba."
+            hint="Crea el primero con el botón de arriba."
           />
         ) : (
           <div className="flex flex-col gap-4">
             {pendingCount > 0 && (
               <p className="text-sm text-accent">
-                Tenés {pendingCount} aporte{pendingCount === 1 ? '' : 's'} pendiente
+                Tienes {pendingCount} aporte{pendingCount === 1 ? '' : 's'} pendiente
                 {pendingCount === 1 ? '' : 's'} de confirmar.
               </p>
             )}

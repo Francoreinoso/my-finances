@@ -57,7 +57,7 @@ export function CategoriasPage() {
         (sorted.length === 0 ? (
           <EmptyState
             title="Todavía no tenés categorías"
-            hint="Creá la primera con el botón de arriba."
+            hint="Crea la primera con el botón de arriba."
           />
         ) : (
           <div className="flex flex-col gap-2">

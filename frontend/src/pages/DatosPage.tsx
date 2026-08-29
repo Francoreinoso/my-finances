@@ -19,11 +19,11 @@ export function DatosPage() {
     try {
       const result = await backupClient.create();
       setBackup({ status: 'done', fileName: result.fileName });
-      notify(`Backup creado: ${result.fileName}`);
+      notify(`Respaldo creado: ${result.fileName}`);
     } catch (e) {
       setBackup({
         status: 'error',
-        message: e instanceof Error ? e.message : 'No se pudo crear el backup',
+        message: e instanceof Error ? e.message : 'No se pudo crear el respaldo',
       });
     }
   };
@@ -47,11 +47,11 @@ export function DatosPage() {
           </p>
           <div className="mt-4">
             <Button onClick={() => void handleBackup()} disabled={backup.status === 'working'}>
-              {backup.status === 'working' ? 'Creando…' : 'Crear backup'}
+              {backup.status === 'working' ? 'Creando…' : 'Crear respaldo'}
             </Button>
           </div>
           {backup.status === 'done' && (
-            <p className="mt-3 text-sm text-success">Backup creado: {backup.fileName}</p>
+            <p className="mt-3 text-sm text-success">Respaldo creado: {backup.fileName}</p>
           )}
           {backup.status === 'error' && (
             <p
@@ -66,7 +66,7 @@ export function DatosPage() {
         <div className="rounded-lg border border-border-default bg-bg-surface/70 p-5 backdrop-blur-sm">
           <h2 className="font-medium text-text-primary">Exportar transacciones</h2>
           <p className="mt-1 text-sm text-text-muted">
-            Descargá todos tus movimientos en CSV — para abrir en Excel o pasarle a un contador.
+            Descarga todos tus movimientos en CSV — para abrir en Excel o pasarle a un contador.
           </p>
           <div className="mt-4">
             <a

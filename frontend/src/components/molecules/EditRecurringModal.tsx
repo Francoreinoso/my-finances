@@ -63,7 +63,7 @@ export function EditRecurringModal({ recurring, onClose, onSubmit }: EditRecurri
         </label>
         {showAmountError && (
           <p id={amountErrorId} className="text-xs text-danger">
-            Ingresá un monto mayor a 0.
+            Ingresa un monto mayor a 0.
           </p>
         )}
 
@@ -74,7 +74,7 @@ export function EditRecurringModal({ recurring, onClose, onSubmit }: EditRecurri
             onChange={(e) => setIsActive(e.target.checked)}
             className="accent-accent"
           />
-          Aporte activo (si lo destildás, queda pausado)
+          Aporte activo (si lo desmarcas, queda pausado)
         </label>
 
         {error && (
